@@ -11,7 +11,7 @@ def make_new_directory(ct):
         print("New trainings directory hasn't been created")
 
 
-def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=True):
+def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=False):
     try:
         make_new_directory(ct)
 
