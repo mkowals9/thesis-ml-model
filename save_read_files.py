@@ -1,8 +1,20 @@
 import json
+from msgspec.json import decode
+import msgspec
 import os
+import numpy as np
 
 DATA_MODEL_NON_UNIFORM_1_MLN = '/home/marcelina/Documents/misc/model_inputs/non_uniform'
 TRAINING_CONFIG_JSON = './training_config.json'
+
+
+class Measurement(msgspec.Struct):
+    reflectance: list[float]
+    wavelengths: list[float]
+    n_eff: list[float]
+    delta_n_eff: list[float]
+    X_z: list[float]
+    period: list[float]
 
 
 def load_data_from_jsons():
@@ -13,12 +25,10 @@ def load_data_from_jsons():
         filenames.pop()
         filenames.pop()
         for filename in filenames:
-            if filename.endswith('.json'):  # Check if the file is a JSON file
-                file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filename)
-                with open(file_path, 'r') as file:
-                    json_data = json.load(file)
-                    data.append(json_data)
-        return data
+            file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filename)
+            with open(file_path, 'rb') as file:
+                data = decode(file.read(), type=list[Measurement])
+        return np.array(data)
     except Exception:
         print("Data setup error")
 
