@@ -30,21 +30,6 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
             plt.show()
             plt.clf()
 
-        # Plot training and validation mae
-        plt.plot(epochs_range, metrics.root_mean_squared_error, label='Training RMSE')
-        plt.plot(epochs_range, metrics.val_root_mean_squared_error, label='Validation RMSE')
-        plt.xlabel('Epochs')
-        plt.ylabel('MAE')
-        plt.title('Training and Validation Root MSE')
-        plt.legend()
-        plt.grid(True)
-        if save_plots:
-            plt.savefig(f'./trainings/{ct}/root_mse_{ct}.png')
-            plt.clf()
-        else:
-            plt.show()
-            plt.clf()
-
         # Plot training and validation mse
         plt.plot(epochs_range, metrics.mean_squared_error, label='Training MSE')
         plt.plot(epochs_range, metrics.val_mean_squared_error, label='Validation MSE')
@@ -78,3 +63,29 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
         print("All plots saved successfully!")
     except Exception:
         print("An error has occurred during plots creation")
+
+
+def plot_predicted_actual_values(sections, y_predicted, y_actual, ct, save_plots=False):
+    for example_index, values in enumerate(y_predicted):
+        for i in range(0, 4):
+            if i == 0:
+                param_name = "n_eff"
+            elif i == 1:
+                param_name = "delta_n_eff"
+            elif i == 2:
+                param_name = "period"
+            else:
+                param_name = "X_z"
+            plt.plot(sections, values[i], label='Predicted values')
+            plt.plot(sections, y_actual[example_index][i], label='Actual values')
+            plt.xlabel('Section')
+            plt.ylabel(f'{param_name}')
+            plt.title(f'Predicted and actual values - parameter {param_name}')
+            plt.legend()
+            plt.grid(True)
+            if save_plots:
+                plt.savefig(f'./trainings/{ct}/predicted_vs_actual_{param_name}_{ct}.png')
+                plt.clf()
+            else:
+                plt.show()
+                plt.clf()

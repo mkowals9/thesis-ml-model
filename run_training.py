@@ -1,22 +1,22 @@
 import datetime
-
 from keras.src.callbacks import EarlyStopping
-
 from metrics import Metrics
 from models_classes.bi_lstm_model import BiLstmModel
-from plots import save_training_stats_as_plots_in_files
+from plots import save_training_stats_as_plots_in_files, plot_predicted_actual_values
 from preprocessing import env_setup, data_setup
 from save_read_files import load_training_config, save_all_to_files
+import numpy as np
 
 env_setup()
 training_config = load_training_config()
 X_test, X_train_reshaped, X_test_reshaped, y_train, y_test = data_setup()
 
 early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='min')
+early_stopping_val_loss = EarlyStopping(monitor='val_loss', patience=1, verbose=1, mode='auto')
 early_stopping_mean_absolute_percentage_error = EarlyStopping(monitor='mean_absolute_percentage_error', patience=8,
                                                               verbose=1, mode='auto')
-early_stopping_loss_rmse = EarlyStopping(monitor='root_mean_squared_error', patience=5, verbose=1, mode='max')
-callbacks = [early_stopping_loss, early_stopping_mean_absolute_percentage_error]
+# early_stopping_loss_rmse = EarlyStopping(monitor='root_mean_squared_error', patience=5, verbose=1, mode='max')
+callbacks = [early_stopping_loss, early_stopping_val_loss, early_stopping_mean_absolute_percentage_error]
 
 print("~ ~ Training start ~ ~")
 print(f"Size of train dataset: {len(X_train_reshaped)}")
@@ -47,6 +47,7 @@ ct = datetime.datetime.now().timestamp()
 ct = str(ct).replace(".", "_")
 
 save_training_stats_as_plots_in_files(epochs_range, model_metrics, ct, training_config["save_plots"])
+plot_predicted_actual_values(np.arange(1, 51), y_predicted, y_test, ct, training_config["save_plots"])
 
 print("~ ~ Saving to files start ~ ~")
 save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, neural_network)

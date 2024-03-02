@@ -49,11 +49,6 @@ def divide_input_data(data):
         y_test[:, 2, :] = np.round(y_test[:, 2, :] * 1e6, 3)
         y_test[:, 3, :] = np.round(y_test[:, 3, :], 3)
 
-
-        # X_train = np.array(X_train)
-        # X_test = np.array(X_test)
-        # y_train = np.array(y_train)
-        # y_test = np.array(y_test)
         return X_train, X_test, y_train, y_test
     except Exception:
         print("Divide input data error")
@@ -63,13 +58,14 @@ def data_setup():
     try:
         data = load_data_from_jsons()
         (X_train, X_test, y_train, y_test) = divide_input_data(data)
-        (X_train_scaled, X_test_scaled) = scaling_Xs(X_train, X_test)
-        del X_train
+        #(X_train_scaled, X_test_scaled) = scaling_Xs(X_train, X_test)
 
-        X_train_reshaped = X_train_scaled.reshape(-1, 1, 500)
-        X_test_reshaped = X_test_scaled.reshape(-1, 1, 500)
-        del X_train_scaled
-        del X_test_scaled
+
+        X_train_reshaped = X_train.reshape(-1, 1, 500)
+        X_test_reshaped = X_test.reshape(-1, 1, 500)
+        del X_train
+        # del X_train_scaled
+        # del X_test_scaled
         del data
         return X_test, X_train_reshaped, X_test_reshaped, y_train, y_test
     except Exception:

@@ -16,16 +16,12 @@ class BiLstmModel:
             Bidirectional(LSTM(300, activation='relu', return_sequences=False)),
             Dense(200, activation='relu'),
             Dense(200, activation='linear'),
-            Dense(4 * 50, activation='linear'),  # Output layer with a shape of 4 lists of 50 elements
             Reshape((4, 50))  # Reshape the output to get four lists of 50 elements
         ])
 
-        root_mean_squared_error = keras.metrics.RootMeanSquaredError()
         mean_squared_error = keras.metrics.MeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
         mean_absolute_percentage_error = keras.metrics.MeanAbsolutePercentageError()
-        mean_squared_logarithmic_error = keras.metrics.MeanSquaredLogarithmicError()
-        log_cosh_error = keras.metrics.LogCoshError()
         model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001),
                       metrics=[mean_squared_error, mean_absolute_error, mean_absolute_percentage_error],
                       loss='mean_squared_error')

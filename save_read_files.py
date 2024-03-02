@@ -44,9 +44,9 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         output_training = {
             "epochs": model_metrics.epochs,
 
-            "rmse": model_metrics.root_mean_squared_error,
-            "val_rmse": model_metrics.val_root_mean_squared_error,
-            "rmse_cal": model_metrics.root_mean_squared_error_cal,
+            #"rmse": model_metrics.root_mean_squared_error,
+            #"val_rmse": model_metrics.val_root_mean_squared_error,
+            #"rmse_cal": model_metrics.root_mean_squared_error_cal,
 
             "mse": model_metrics.mean_squared_error,
             "val_mse": model_metrics.val_mean_squared_error,
@@ -59,14 +59,14 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             "loss": model_metrics.loss,
             "val_loss": model_metrics.val_loss,
 
-            "logcosh": model_metrics.logcosh,
-            "val_logcosh": model_metrics.val_logcosh,
+            #"logcosh": model_metrics.logcosh,
+            #"val_logcosh": model_metrics.val_logcosh,
 
             "mean_absolute_percentage_error": model_metrics.mean_absolute_percentage_error,
             "val_mean_absolute_percentage_error": model_metrics.val_mean_absolute_percentage_error,
 
-            "mean_squared_logarithmic_error": model_metrics.mean_squared_logarithmic_error,
-            "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
+            #"mean_squared_logarithmic_error": model_metrics.mean_squared_logarithmic_error,
+            #"val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
             "note": ""
@@ -81,7 +81,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         with open(f"./trainings/{ct}/model_training_output_{ct}_{nn_trained.model_name}.json", "w") as outfile:
             json.dump(output_training, outfile, indent=4)
 
-        with open(f"./stats/{ct}/model_output_{ct}_{nn_trained.model_name}.json", "w") as outfile:
+        with open(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}.json", "w") as outfile:
             json.dump(output_results, outfile, indent=4)
 
         filename_model = f"{nn_trained.model_name}_trained_model_" + ct + ".keras"
