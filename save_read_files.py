@@ -1,24 +1,23 @@
 import json
+import os
 
-DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_ = '/home/marcelina/Documents/misc/model_inputs/data_model_25_param_input_with_X_z_'
+DATA_MODEL_NON_UNIFORM_1_MLN = '/home/marcelina/Documents/misc/model_inputs/non_uniform'
 TRAINING_CONFIG_JSON = './training_config.json'
 
 
 def load_data_from_jsons():
     try:
         data = []
-        with open('%s0.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_1:
-            data.extend(json.load(json_file_1))
-        with open('%s1.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_2:
-            data.extend(json.load(json_file_2))
-        with open('%s2.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_3:
-            data.extend(json.load(json_file_3))
-        with open('%s3.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_4:
-            data.extend(json.load(json_file_4))
-        with open('%s4.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_5:
-            data.extend(json.load(json_file_5))
-        with open('%s5.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_6:
-            data.extend(json.load(json_file_6))
+        filenames = os.listdir(DATA_MODEL_NON_UNIFORM_1_MLN)
+        filenames.pop()
+        filenames.pop()
+        filenames.pop()
+        for filename in filenames:
+            if filename.endswith('.json'):  # Check if the file is a JSON file
+                file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filename)
+                with open(file_path, 'r') as file:
+                    json_data = json.load(file)
+                    data.append(json_data)
         return data
     except Exception:
         print("Data setup error")

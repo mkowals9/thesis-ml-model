@@ -25,35 +25,35 @@ def convert_to_decibels(data):
 
 
 def scaling_Xs(X_train, X_test):
-    return (np.array([sc.fit_transform(X) for X in X_train]),
-            np.array([sc.fit_transform(X) for X in X_test]))
+    sc.fit(X_train)
+    return sc.transform(X_train), sc.transform(X_test)
 
 
 def divide_input_data(data):
     try:
         random.shuffle(data)
-        #TODO poprawić
-        max_wavelength = max(wavelengths)
-        X_data = []
-        for data_object in data:
-            X_temp = []
-            for index, ref in enumerate(data_object["reflectance"]):
-                X_temp.append([wavelengths[index] / max_wavelength, ref])
-            X_data.append(X_temp)
+        X_data = [data_object["reflectance"] for data_object in data]
         y_data = [[data_object["n_eff"], data_object["delta_n_eff"], data_object["period"], data_object["X_z"]]
                   for data_object in data]
-
+        del data
         X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=4280)
+        del X_data
+        del y_data
 
-        y_train = [[round(sublist[0], 3), sublist[1] * 1e3,
-                    sublist[2] * 1e6, round(sublist[3], 2)] for sublist in y_train]
-        y_test = [[round(sublist[0], 3), sublist[1] * 1e3,
-                   sublist[2] * 1e6, round(sublist[3], 2)] for sublist in y_test]
+        # Preprocessing y_train and y_test
+        def preprocess_data(data):
+            return [[round(sublist[0], 3), sublist[1] * 1e3, sublist[2] * 1e6, round(sublist[3], 2)] for sublist in
+                    data]
 
-        y_train = [[sublist[0], round(sublist[1], 3),
-                    round(sublist[2], 3), sublist[3]] for sublist in y_train]
-        y_test = [[sublist[0], round(sublist[1], 3),
-                   round(sublist[2], 3), sublist[3]] for sublist in y_test]
+        y_train = preprocess_data(y_train)
+        y_test = preprocess_data(y_test)
+
+        # Another round of preprocessing
+        def round_data(data):
+            return [[sublist[0], round(sublist[1], 3), round(sublist[2], 3), sublist[3]] for sublist in data]
+
+        y_train = round_data(y_train)
+        y_test = round_data(y_test)
 
         X_train = np.array(X_train)
         X_test = np.array(X_test)
@@ -72,6 +72,8 @@ def data_setup():
 
         X_train_reshaped = X_train_scaled.reshape(len(X_train_scaled), -1)
         X_test_reshaped = X_test_scaled.reshape(len(X_test_scaled), -1)
+        del X_train_scaled
+        del X_test_scaled
         return X_test, X_train_reshaped, X_test_reshaped, y_train, y_test
     except Exception:
         print("Data setup error")

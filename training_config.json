@@ -1,5 +1,5 @@
 {
-  "batch_size": 8,
-  "epochs": 200,
+  "batch_size": 128,
+  "epochs": 20,
   "save_plots": true
 }

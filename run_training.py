@@ -3,6 +3,7 @@ import datetime
 from keras.src.callbacks import EarlyStopping
 
 from metrics import Metrics
+from models_classes.bi_lstm_model import BiLstmModel
 from plots import save_training_stats_as_plots_in_files
 from preprocessing import env_setup, data_setup
 from save_read_files import load_training_config, save_all_to_files
@@ -20,11 +21,11 @@ callbacks = [early_stopping_loss, early_stopping_mean_absolute_percentage_error]
 print("~ ~ Training start ~ ~")
 print(f"Size of train dataset: {len(X_train_reshaped)}")
 print(f"Size of test dataset: {len(X_test)}")
-neural_network = BaseNeuralNetworkFor4Outputs()
+neural_network = BiLstmModel()
 history = neural_network.model.fit(X_train_reshaped, y_train,
                                    batch_size=training_config["batch_size"],
                                    epochs=training_config["epochs"],
-                                   validation_split=0.2,
+                                   validation_split=0.1,
                                    verbose=1,
                                    callbacks=callbacks)
 
