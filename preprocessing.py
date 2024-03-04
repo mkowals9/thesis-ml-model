@@ -31,8 +31,8 @@ def scaling_Xs(X_train, X_test):
 def divide_input_data(data):
     try:
         random.shuffle(data)
-        X_data = np.array([data_object.reflectance for data_object in data])
-        y_data = np.array([[data_object.n_eff, data_object.delta_n_eff, data_object.period, data_object.X_z]
+        X_data = np.array([data_object['reflectance'] for data_object in data])
+        y_data = np.array([[data_object['n_eff'], data_object['delta_n_eff'], data_object['period'], data_object['X_z']]
                            for data_object in data])
         del data
         X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=4280)
@@ -58,14 +58,13 @@ def data_setup():
     try:
         data = load_data_from_jsons()
         (X_train, X_test, y_train, y_test) = divide_input_data(data)
-        #(X_train_scaled, X_test_scaled) = scaling_Xs(X_train, X_test)
+        (X_train_scaled, X_test_scaled) = scaling_Xs(X_train, X_test)
 
-
-        X_train_reshaped = X_train.reshape(-1, 1, 500)
-        X_test_reshaped = X_test.reshape(-1, 1, 500)
+        X_train_reshaped = X_train_scaled.reshape(-1, 1, 500)
+        X_test_reshaped = X_test_scaled.reshape(-1, 1, 500)
         del X_train
-        # del X_train_scaled
-        # del X_test_scaled
+        del X_train_scaled
+        del X_test_scaled
         del data
         return X_test, X_train_reshaped, X_test_reshaped, y_train, y_test
     except Exception:

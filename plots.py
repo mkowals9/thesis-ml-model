@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import os
+import random
 
 
 def make_new_directory(ct):
@@ -21,6 +22,7 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
         plt.title('Training and Validation Loss')
+        plt.yscale('log')
         plt.legend()
         plt.grid(True)
         if save_plots:
@@ -36,6 +38,7 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
         plt.xlabel('Epochs')
         plt.ylabel('MSE')
         plt.title('Training and Validation MSE')
+        plt.yscale('log')
         plt.legend()
         plt.grid(True)
         if save_plots:
@@ -51,6 +54,7 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
         plt.xlabel('Epochs')
         plt.ylabel('MAE')
         plt.title('Training and Validation MAE')
+        plt.yscale('log')
         plt.legend()
         plt.grid(True)
         if save_plots:
@@ -66,7 +70,8 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
 
 
 def plot_predicted_actual_values(sections, y_predicted, y_actual, ct, save_plots=False):
-    for example_index, values in enumerate(y_predicted):
+    random_values = random.sample(range(0, len(y_predicted)), 10)
+    for example_index in random_values:
         for i in range(0, 4):
             if i == 0:
                 param_name = "n_eff"
@@ -76,15 +81,15 @@ def plot_predicted_actual_values(sections, y_predicted, y_actual, ct, save_plots
                 param_name = "period"
             else:
                 param_name = "X_z"
-            plt.plot(sections, values[i], label='Predicted values')
-            plt.plot(sections, y_actual[example_index][i], label='Actual values')
+            plt.plot(sections, y_predicted[example_index][i], drawstyle='steps-post', label='Predicted values')
+            plt.plot(sections, y_actual[example_index][i], drawstyle='steps-post', label='Actual values')
             plt.xlabel('Section')
             plt.ylabel(f'{param_name}')
             plt.title(f'Predicted and actual values - parameter {param_name}')
             plt.legend()
             plt.grid(True)
             if save_plots:
-                plt.savefig(f'./trainings/{ct}/predicted_vs_actual_{param_name}_{ct}.png')
+                plt.savefig(f'./trainings/{ct}/predicted_vs_actual_{param_name}_{example_index}_{ct}.png')
                 plt.clf()
             else:
                 plt.show()

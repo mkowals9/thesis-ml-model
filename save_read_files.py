@@ -1,10 +1,11 @@
 import json
+import ijson
 from msgspec.json import decode
 import msgspec
 import os
 import numpy as np
 
-DATA_MODEL_NON_UNIFORM_1_MLN = '/home/marcelina/Documents/misc/model_inputs/non_uniform'
+DATA_MODEL_NON_UNIFORM_1_MLN = '/home/marcelina/Documents/misc/model_inputs/non_uniform/npys'
 TRAINING_CONFIG_JSON = './training_config.json'
 
 
@@ -19,17 +20,19 @@ class Measurement(msgspec.Struct):
 
 def load_data_from_jsons():
     try:
-        data = []
-        filenames = os.listdir(DATA_MODEL_NON_UNIFORM_1_MLN)
-        filenames.pop()
-        filenames.pop()
-        filenames.pop()
-        for filename in filenames:
-            file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filename)
-            with open(file_path, 'rb') as file:
-                data = decode(file.read(), type=list[Measurement])
-        return np.array(data)
-    except Exception:
+        np_new_load = lambda *a, **k: np.load(*a, allow_pickle=True, **k)
+        filenames = [name for name in os.listdir(DATA_MODEL_NON_UNIFORM_1_MLN) if name.find('.npy')]
+        first_file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filenames[0])
+        data = np_new_load(first_file_path)
+        # for filename in filenames[1:]:
+        filename = filenames[1]
+        file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filename)
+        array = np_new_load(file_path)
+        data = np.concatenate((data, array), axis=0)
+        del array
+        return data
+    except Exception as e:
+        print(e)
         print("Data setup error")
 
 
@@ -44,9 +47,9 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         output_training = {
             "epochs": model_metrics.epochs,
 
-            #"rmse": model_metrics.root_mean_squared_error,
-            #"val_rmse": model_metrics.val_root_mean_squared_error,
-            #"rmse_cal": model_metrics.root_mean_squared_error_cal,
+            # "rmse": model_metrics.root_mean_squared_error,
+            # "val_rmse": model_metrics.val_root_mean_squared_error,
+            # "rmse_cal": model_metrics.root_mean_squared_error_cal,
 
             "mse": model_metrics.mean_squared_error,
             "val_mse": model_metrics.val_mean_squared_error,
@@ -59,17 +62,17 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             "loss": model_metrics.loss,
             "val_loss": model_metrics.val_loss,
 
-            #"logcosh": model_metrics.logcosh,
-            #"val_logcosh": model_metrics.val_logcosh,
+            # "logcosh": model_metrics.logcosh,
+            # "val_logcosh": model_metrics.val_logcosh,
 
-            "mean_absolute_percentage_error": model_metrics.mean_absolute_percentage_error,
-            "val_mean_absolute_percentage_error": model_metrics.val_mean_absolute_percentage_error,
+            #"mean_absolute_percentage_error": model_metrics.mean_absolute_percentage_error,
+            #"val_mean_absolute_percentage_error": model_metrics.val_mean_absolute_percentage_error,
 
-            #"mean_squared_logarithmic_error": model_metrics.mean_squared_logarithmic_error,
-            #"val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
+            # "mean_squared_logarithmic_error": model_metrics.mean_squared_logarithmic_error,
+            # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": ""
+            "note": "[x,y] zamiast y, danych wszystkich bylo 400k"
         }
 
         output_results = {
@@ -89,3 +92,17 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         print(f"All metrics, data and model saved successfully in {ct} folder and in {filename_model}!")
     except Exception:
         print("Save files error")
+
+
+def convert_json_to_npy():
+    filenames = ['data_model_input_last.json']
+    for filename in filenames:
+        file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filename)
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+        array_data = np.array(list(data.values()))
+        np.save(DATA_MODEL_NON_UNIFORM_1_MLN + '/data_model_input_last.npy', array_data)
+
+
+# if __name__ == "__main__":
+#     convert_json_to_npy()

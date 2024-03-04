@@ -1,8 +1,7 @@
 import keras
 from keras import Input
 from keras.models import Sequential
-from keras.src.layers import Reshape
-from tensorflow import optimizers
+from keras.src.layers import Reshape, Dropout
 from keras.layers import Dense, LSTM, Bidirectional
 
 
@@ -12,8 +11,10 @@ class BiLstmModel:
         model = Sequential([
             Input(shape=self.input_shape),
             Bidirectional(LSTM(500, activation='relu', return_sequences=True)),
-            Bidirectional(LSTM(300, activation='relu', return_sequences=True)),
-            Bidirectional(LSTM(300, activation='relu', return_sequences=False)),
+            #Dropout(rate=0.5),
+            Bidirectional(LSTM(400, activation='relu', return_sequences=True)),
+            #Dropout(rate=0.2),
+            Bidirectional(LSTM(400, activation='relu', return_sequences=False)),
             Dense(200, activation='relu'),
             Dense(200, activation='linear'),
             Reshape((4, 50))  # Reshape the output to get four lists of 50 elements
@@ -21,9 +22,8 @@ class BiLstmModel:
 
         mean_squared_error = keras.metrics.MeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
-        mean_absolute_percentage_error = keras.metrics.MeanAbsolutePercentageError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001),
-                      metrics=[mean_squared_error, mean_absolute_error, mean_absolute_percentage_error],
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001, epsilon=1e-6),
+                      metrics=[mean_squared_error, mean_absolute_error],
                       loss='mean_squared_error')
         model.summary()
 
