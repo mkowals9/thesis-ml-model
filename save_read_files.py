@@ -1,21 +1,81 @@
 import json
-import ijson
-from msgspec.json import decode
-import msgspec
+import re
 import os
 import numpy as np
+import math
 
 DATA_MODEL_NON_UNIFORM_1_MLN = '/home/marcelina/Documents/misc/model_inputs/non_uniform/npys'
+DATA_MODEL_1ST_CHUNKED = '/home/marcelina/Documents/misc/model_inputs/pierwsze_chunked_data'
+DATA_MODEL_GAUSS = '/home/marcelina/Documents/misc/model_inputs/gauss'
+DATA_MODEL_CORRECT_GAUSS = '/home/marcelina/Documents/misc/model_inputs/gauss_correct'
+DATA_MODEL_GAUSS_MORE_RANDOM = '/home/marcelina/Documents/misc/model_inputs/gauss_more_random'
+
 TRAINING_CONFIG_JSON = './training_config.json'
 
 
-class Measurement(msgspec.Struct):
-    reflectance: list[float]
-    wavelengths: list[float]
-    n_eff: list[float]
-    delta_n_eff: list[float]
-    X_z: list[float]
-    period: list[float]
+def convert_to_decibels(data):
+    return 10 * np.log10(data)
+
+
+def extract_chunk_index(filename):
+    match = re.search(r'chunk_(\d+)', filename)
+    if match:
+        return int(match.group(1))
+    else:
+        return None
+
+
+def chunk_to_list(chunk_dict):
+    np_new_load = lambda *a, **k: np.load(*a, allow_pickle=True, **k)
+    X_z = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["X_z"][0]))
+    delta_n_eff = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["delta_n_eff"][0]))
+    n_eff = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["n_eff"][0]))
+    period = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["period"][0]))
+    reflectances = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["reflectances"][0]))
+    #reflectances = convert_to_decibels(bare_ref)
+    wavelengths = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["wavelengths"][0]))
+    return n_eff, period, wavelengths, reflectances, X_z, delta_n_eff
+
+
+def load_chunked_data_npy():
+    filenames = os.listdir(DATA_MODEL_GAUSS_MORE_RANDOM)
+    chunks = {}
+
+    for filename in filenames:
+        chunk_index = extract_chunk_index(filename)
+        if chunk_index is not None:
+            data_type = re.search(r'model_input_(\w+)_chunk', filename).group(1)
+            if chunk_index not in chunks:
+                chunks[chunk_index] = {}
+            chunks[chunk_index].setdefault(data_type, []).append(filename)
+    chunks_list = list(chunks.values())
+
+    loaded_chunk_data_org = [chunk_to_list(chunk_dict) for chunk_dict in chunks_list]
+    # tylko 1/2 danych
+    subarray_length = len(loaded_chunk_data_org) // 2
+    start_index = len(loaded_chunk_data_org) // 2  # Choosing the middle as the starting index, you can choose any other valid index as well
+
+    loaded_chunk_data = loaded_chunk_data_org[start_index:start_index + subarray_length]
+
+    #tylko reflektancje w osi X
+    #X_data = np.array([sublist for object_data in loaded_chunk_data for sublist in object_data[3]])
+
+    # (X,Y) w X_data
+    reflectances = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
+    wavelengths = loaded_chunk_data_org[0][2][0] * 1e9
+    X_data = np.empty((len(reflectances), len(reflectances[0]), 2))
+    for i, reflectance in enumerate(reflectances):
+        X_data[i, :, 0] = wavelengths  # Assign wavelengths to the first column
+        X_data[i, :, 1] = reflectance
+
+    # wszystko w y_data
+    n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[0]])
+    periods = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+    Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
+    delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[5]])
+    y_data = np.array(
+        [np.array([n_effs[i], periods[i], Xzs[i], delta_n_effs[i]]) for i in range(len(n_effs))])
+    return X_data, y_data
 
 
 def load_data_from_jsons():
@@ -33,7 +93,7 @@ def load_data_from_jsons():
         return data
     except Exception as e:
         print(e)
-        print("Data setup error")
+        print(f"Data setup error: {e}")
 
 
 def load_training_config():
@@ -47,8 +107,8 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         output_training = {
             "epochs": model_metrics.epochs,
 
-            # "rmse": model_metrics.root_mean_squared_error,
-            # "val_rmse": model_metrics.val_root_mean_squared_error,
+            "rmse": model_metrics.root_mean_squared_error,
+            "val_rmse": model_metrics.val_root_mean_squared_error,
             # "rmse_cal": model_metrics.root_mean_squared_error_cal,
 
             "mse": model_metrics.mean_squared_error,
@@ -72,7 +132,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": "[x,y] zamiast y, danych wszystkich bylo 400k"
+            "note": "bilstm, gauss"
         }
 
         output_results = {
@@ -90,8 +150,8 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         filename_model = f"{nn_trained.model_name}_trained_model_" + ct + ".keras"
         nn_trained.model.save(f"./trainings/{ct}/{filename_model}")
         print(f"All metrics, data and model saved successfully in {ct} folder and in {filename_model}!")
-    except Exception:
-        print("Save files error")
+    except Exception as e:
+        print(f"Save files error: {e}")
 
 
 def convert_json_to_npy():
@@ -102,7 +162,6 @@ def convert_json_to_npy():
             data = json.load(f)
         array_data = np.array(list(data.values()))
         np.save(DATA_MODEL_NON_UNIFORM_1_MLN + '/data_model_input_last.npy', array_data)
-
 
 # if __name__ == "__main__":
 #     convert_json_to_npy()

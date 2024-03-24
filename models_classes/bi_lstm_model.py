@@ -3,27 +3,35 @@ from keras import Input
 from keras.models import Sequential
 from keras.src.layers import Reshape, Dropout
 from keras.layers import Dense, LSTM, Bidirectional
+from tensorflow.keras import regularizers
 
 
 class BiLstmModel:
 
     def create_standard_model(self):
+        l2_lambda = 0.1
+        output_size = (4, 15)
+
         model = Sequential([
             Input(shape=self.input_shape),
-            Bidirectional(LSTM(500, activation='relu', return_sequences=True)),
-            #Dropout(rate=0.5),
-            Bidirectional(LSTM(400, activation='relu', return_sequences=True)),
-            #Dropout(rate=0.2),
-            Bidirectional(LSTM(400, activation='relu', return_sequences=False)),
-            Dense(200, activation='relu'),
-            Dense(200, activation='linear'),
-            Reshape((4, 50))  # Reshape the output to get four lists of 50 elements
+            Bidirectional(LSTM(300, activation='relu', return_sequences=True)),
+            Dropout(rate=0.45),
+            Bidirectional(LSTM(180, activation='relu', return_sequences=True)),
+            Dropout(rate=0.45),
+            # Bidirectional(LSTM(200, activation='relu', return_sequences=False)),
+            Dense(100, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
+            # Dense(15, activation='relu'),
+            # jesli na wyjsciu mamy jeden array
+            # Dense(15, activation='linear', kernel_regularizer=regularizers.l2(l2_lambda)),
+            Dense(4 * 15, activation='relu'),
+            Reshape((-1,) + output_size)
         ])
 
         mean_squared_error = keras.metrics.MeanSquaredError()
+        root_mean_squared_error = keras.metrics.RootMeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001, epsilon=1e-6),
-                      metrics=[mean_squared_error, mean_absolute_error],
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.0001),
+                      metrics=[mean_absolute_error, root_mean_squared_error],
                       loss='mean_squared_error')
         model.summary()
 
@@ -34,7 +42,8 @@ class BiLstmModel:
         # input_shape = (800, 1)
         # shape of initial is n,800,2 [[x1, y1], .. ]
         # self.input_shape = (1600, 1)
-        self.input_shape = (1, 500,)
+        # self.input_shape = (1, 300) <- jak mamy tylko [[y1, y2] .. ]
+        self.input_shape = (300, 2)
         # self.output_dim = 4
         self.model = None
         self.create_standard_model()

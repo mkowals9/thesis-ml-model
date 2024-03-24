@@ -1,51 +1,131 @@
 import datetime
+import json
+
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import KFold
 from keras.src.callbacks import EarlyStopping
 from metrics import Metrics
 from models_classes.bi_lstm_model import BiLstmModel
-from plots import save_training_stats_as_plots_in_files, plot_predicted_actual_values
+from models_classes.lstm_model import LstmModel
+from models_classes.cnn_model import CnnModel
+from plots import save_training_stats_as_plots_in_files, plot_predicted_actual_single_array_values, \
+    plot_predicted_actual_many_arrays_values
 from preprocessing import env_setup, data_setup
 from save_read_files import load_training_config, save_all_to_files
 import numpy as np
 
-env_setup()
-training_config = load_training_config()
-X_test, X_train_reshaped, X_test_reshaped, y_train, y_test = data_setup()
-
-early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='auto')
-early_stopping_val_loss = EarlyStopping(monitor='val_loss', patience=5, verbose=1, mode='auto')
-# early_stopping_mean_absolute_percentage_error = EarlyStopping(monitor='mean_absolute_percentage_error', patience=8,
-#                                                               verbose=1, mode='auto')
-# callbacks = [early_stopping_loss, early_stopping_val_loss]
-
-print("~ ~ Training start ~ ~")
-print(f"Size of train dataset: {len(X_train_reshaped)}")
-print(f"Size of test dataset: {len(X_test)}")
 neural_network = BiLstmModel()
-history = neural_network.model.fit(X_train_reshaped, y_train,
-                                   batch_size=training_config["batch_size"],
-                                   epochs=training_config["epochs"],
-                                   validation_split=0.1,
-                                   verbose=1)
 
-print("~ ~ Metrics calculation start ~ ~")
-score = neural_network.model.evaluate(X_train_reshaped, y_train, verbose=1)
-print("Loss training:", score[1])
-score = neural_network.model.evaluate(X_test_reshaped, y_test, verbose=1)
-print("Loss test:", score[1])
 
-y_predicted = neural_network.model.predict(X_test_reshaped, training_config["batch_size"])
+def run_training_with_callbacks_and_k_folds():
+    X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data()
 
-model_metrics = Metrics()
-model_metrics.calculate(y_test, y_predicted)
-model_metrics.save_history_training_data(training_config, history)
+    early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='auto')
+    early_stopping_val_loss = EarlyStopping(monitor='val_loss', patience=5, verbose=1, mode='auto')
+    callbacks = [early_stopping_loss, early_stopping_val_loss]
 
-print("~ ~ Plots ~ ~")
-epochs_range = range(1, model_metrics.epochs + 1)
-ct = datetime.datetime.now().timestamp()
-ct = str(ct).replace(".", "_")
+    print("~ ~ Training start ~ ~")
+    kf = KFold(n_splits=training_config["k_folds"])
+    mse_scores = []
+    histories = []
+    models = []
+    for train_index, val_index in kf.split(X_train_reshaped):
+        X_train_fold, X_val_fold = X_train_reshaped[train_index], X_train_reshaped[val_index]
+        y_train_fold, y_val_fold = y_train[train_index], y_train[val_index]
+        print(f"~ ~ Training start fold {train_index} ~ ~")
+        neural_network = BiLstmModel()
+        history = neural_network.model.fit(X_train_fold, y_train_fold,
+                                           batch_size=training_config["batch_size"],
+                                           epochs=training_config["epochs"],
+                                           validation_split=0.05,
+                                           verbose=1,
+                                           callbacks=callbacks)
+        models.append(neural_network)
+        mse = neural_network.model.evaluate(X_val_fold, y_val_fold, verbose=0)[0]
+        mse_scores.append(mse)
+        histories.append(history)
 
-save_training_stats_as_plots_in_files(epochs_range, model_metrics, ct, training_config["save_plots"])
-plot_predicted_actual_values(np.arange(1, 51), y_predicted, y_test, ct, training_config["save_plots"])
+    # Calculate average MSE across folds
+    avg_mse = np.mean(mse_scores)
+    print("Average MSE:", avg_mse)
 
-print("~ ~ Saving to files start ~ ~")
-save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, neural_network)
+    ct = datetime.datetime.now().timestamp()
+    ct = str(ct).replace(".", "_")
+
+    # Find the best model based on the lowest average MSE
+    best_model_index = np.argmin(mse_scores)
+    print("Best model index and its mse:", best_model_index, mse_scores[best_model_index])
+
+    #with open(f"./trainings/{ct}/model_training_output_histories.json", "w") as outfile:
+    #    json.dump(histories, outfile, indent=4)
+
+        # perform_after_training_actions(X_test, X_test_reshaped, X_train_fold, history, training_config, y_test, y_train)
+
+
+def run_training_with_callbacks():
+    X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data()
+
+    early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='auto')
+    early_stopping_val_loss = EarlyStopping(monitor='val_loss', patience=5, verbose=1, mode='auto')
+    callbacks = [early_stopping_loss, early_stopping_val_loss]
+
+    print("~ ~ Training start ~ ~")
+
+    history = neural_network.model.fit(X_train_reshaped, y_train,
+                                       batch_size=training_config["batch_size"],
+                                       epochs=training_config["epochs"],
+                                       validation_split=0.05,
+                                       verbose=1,
+                                       callbacks=callbacks)
+
+    perform_after_training_actions(X_test, X_test_reshaped, X_train_reshaped, history, training_config, y_test, y_train)
+
+
+def run_training_without_callbacks():
+    X_test, X_train_reshaped, X_test_reshaped, training_config, y_test, y_train = prepare_data()
+
+    print("~ ~ Training start ~ ~")
+    history = neural_network.model.fit(X_train_reshaped, y_train,
+                                       batch_size=training_config["batch_size"],
+                                       epochs=training_config["epochs"],
+                                       validation_split=0.1,
+                                       verbose=1)
+
+    perform_after_training_actions(X_test, X_test_reshaped, X_train_reshaped, history, training_config, y_test, y_train)
+
+
+def perform_after_training_actions(X_test, X_test_reshaped, X_train_reshaped, history, training_config, y_test,
+                                   y_train):
+    print("~ ~ Metrics calculation start ~ ~")
+    score = neural_network.model.evaluate(X_train_reshaped, y_train, verbose=1)
+    print("Loss training:", score[1])
+    score = neural_network.model.evaluate(X_test_reshaped, y_test, verbose=1)
+    print("Loss test:", score[1])
+    y_predicted = neural_network.model.predict(X_test_reshaped, training_config["batch_size"])
+    model_metrics = Metrics()
+    model_metrics.calculate(y_test, y_predicted)
+    model_metrics.save_history_training_data(training_config, history)
+
+    print("~ ~ Plots ~ ~")
+    epochs_range = range(1, model_metrics.epochs + 1)
+    ct = datetime.datetime.now().timestamp()
+    ct = str(ct).replace(".", "_")
+    save_training_stats_as_plots_in_files(epochs_range, model_metrics, ct, training_config["save_plots"])
+    plot_predicted_actual_many_arrays_values(y_predicted, y_test, ct, training_config["save_plots"])
+
+    print("~ ~ Saving to files start ~ ~")
+    save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, neural_network)
+
+
+def prepare_data():
+    training_config = load_training_config()
+    X_test, X_train_reshaped, X_test_reshaped, y_train, y_test = data_setup()
+    print(f"Size of train dataset: {len(X_train_reshaped)}")
+    print(f"Size of test dataset: {len(X_test)}")
+    return X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train
+
+
+if __name__ == "__main__":
+    env_setup()
+    run_training_with_callbacks()
+    #run_training_without_callbacks()
