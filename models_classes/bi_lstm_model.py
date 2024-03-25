@@ -9,15 +9,15 @@ from tensorflow.keras import regularizers
 class BiLstmModel:
 
     def create_standard_model(self):
-        l2_lambda = 0.1
+        l2_lambda = 0.2
         output_size = (4, 15)
 
         model = Sequential([
             Input(shape=self.input_shape),
             Bidirectional(LSTM(300, activation='relu', return_sequences=True)),
-            Dropout(rate=0.45),
-            Bidirectional(LSTM(180, activation='relu', return_sequences=True)),
-            Dropout(rate=0.45),
+            Dropout(rate=0.5),
+            Bidirectional(LSTM(100, activation='relu', return_sequences=True)),
+            Dropout(rate=0.5),
             # Bidirectional(LSTM(200, activation='relu', return_sequences=False)),
             Dense(100, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
             # Dense(15, activation='relu'),
@@ -30,7 +30,7 @@ class BiLstmModel:
         mean_squared_error = keras.metrics.MeanSquaredError()
         root_mean_squared_error = keras.metrics.RootMeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.0001),
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-7),
                       metrics=[mean_absolute_error, root_mean_squared_error],
                       loss='mean_squared_error')
         model.summary()

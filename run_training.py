@@ -96,11 +96,12 @@ def run_training_without_callbacks():
 
 def perform_after_training_actions(X_test, X_test_reshaped, X_train_reshaped, history, training_config, y_test,
                                    y_train):
-    print("~ ~ Metrics calculation start ~ ~")
-    score = neural_network.model.evaluate(X_train_reshaped, y_train, verbose=1)
-    print("Loss training:", score[1])
-    score = neural_network.model.evaluate(X_test_reshaped, y_test, verbose=1)
-    print("Loss test:", score[1])
+    # print("~ ~ Metrics calculation start ~ ~")
+    # score = neural_network.model.evaluate(X_train_reshaped, y_train, verbose=1)
+    # print("Loss training:", score[1])
+    # score = neural_network.model.evaluate(X_test_reshaped, y_test, verbose=1)
+    # print("Loss test:", score[1])
+    print("~ ~ Metrics ~ ~")
     y_predicted = neural_network.model.predict(X_test_reshaped, training_config["batch_size"])
     model_metrics = Metrics()
     model_metrics.calculate(y_test, y_predicted)

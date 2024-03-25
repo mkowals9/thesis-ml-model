@@ -62,7 +62,7 @@ def load_chunked_data_npy():
 
     # (X,Y) w X_data
     reflectances = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
-    wavelengths = loaded_chunk_data_org[0][2][0] * 1e9
+    wavelengths = loaded_chunk_data[0][2][0]
     X_data = np.empty((len(reflectances), len(reflectances[0]), 2))
     for i, reflectance in enumerate(reflectances):
         X_data[i, :, 0] = wavelengths  # Assign wavelengths to the first column
