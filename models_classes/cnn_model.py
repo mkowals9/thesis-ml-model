@@ -10,18 +10,19 @@ class CnnModel:
     def create_standard_model(self):
         model = Sequential([
             Input(shape=self.input_shape),
-            Reshape((500, 1)),
-            Conv1D(filters=30, kernel_size=2, activation='relu', padding='same'),
+            Conv1D(filters=40, kernel_size=2, activation='relu'),  # 64
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=28, kernel_size=2, activation='relu', padding='same'),
+            Conv1D(filters=32, kernel_size=2, activation='relu'),  # 40
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=25, kernel_size=2, activation='relu', padding='same'),
+            Conv1D(filters=25, kernel_size=2, activation='relu'),  # 32
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=20, kernel_size=2, activation='relu', padding='same'),
+            Conv1D(filters=20, kernel_size=2, activation='relu'),  # 20
+            MaxPooling1D(pool_size=2),
+            Conv1D(filters=16, kernel_size=2, activation='relu'),
             MaxPooling1D(pool_size=2),
             Dropout(0.1),
             Flatten(),
-            Dense(units=self.output_dim, activation='linear')
+            Dense(self.output_dim, activation='linear')
         ])
 
         mean_squared_error = keras.metrics.MeanSquaredError()
@@ -39,8 +40,8 @@ class CnnModel:
         # input_shape = (800, 1)
         # shape of initial is n,800,2 [[x1, y1], .. ]
         # self.input_shape = (1600, 1)
-        self.input_shape = (500, )
+        self.input_shape = (300, 2)
         self.model = None
-        self.output_dim = 20
+        self.output_dim = 15
         self.create_standard_model()
-        self.model_name = "bi_lstm_model"
+        self.model_name = "cnn_model"

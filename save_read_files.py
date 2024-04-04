@@ -9,6 +9,8 @@ DATA_MODEL_1ST_CHUNKED = '/home/marcelina/Documents/misc/model_inputs/pierwsze_c
 DATA_MODEL_GAUSS = '/home/marcelina/Documents/misc/model_inputs/gauss'
 DATA_MODEL_CORRECT_GAUSS = '/home/marcelina/Documents/misc/model_inputs/gauss_correct'
 DATA_MODEL_GAUSS_MORE_RANDOM = '/home/marcelina/Documents/misc/model_inputs/gauss_more_random'
+DATA_MODEL_FIRST_PARABOLIC = '/home/marcelina/Documents/misc/model_inputs/parabolic_first'
+DATA_MODEL_PARABOLIC_SCALED = '/home/marcelina/Documents/misc/model_inputs/parabol_different_scales'
 
 TRAINING_CONFIG_JSON = './training_config.json'
 
@@ -27,18 +29,18 @@ def extract_chunk_index(filename):
 
 def chunk_to_list(chunk_dict):
     np_new_load = lambda *a, **k: np.load(*a, allow_pickle=True, **k)
-    X_z = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["X_z"][0]))
-    delta_n_eff = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["delta_n_eff"][0]))
-    n_eff = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["n_eff"][0]))
-    period = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["period"][0]))
-    reflectances = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["reflectances"][0]))
+    X_z = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["X_z"][0]))
+    delta_n_eff = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["delta_n_eff"][0]))
+    n_eff = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["n_eff"][0]))
+    period = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["period"][0]))
+    reflectances = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["reflectances"][0]))
     #reflectances = convert_to_decibels(bare_ref)
-    wavelengths = np_new_load(os.path.join(DATA_MODEL_GAUSS_MORE_RANDOM, chunk_dict["wavelengths"][0]))
-    return n_eff, period, wavelengths, reflectances, X_z, delta_n_eff
+    #wavelengths = np_new_load(os.path.join(DATA_MODEL_FIRST_PARABOLIC, chunk_dict["wavelengths"][0]))
+    return n_eff, period, reflectances, X_z, delta_n_eff
 
 
 def load_chunked_data_npy():
-    filenames = os.listdir(DATA_MODEL_GAUSS_MORE_RANDOM)
+    filenames = os.listdir(DATA_MODEL_PARABOLIC_SCALED)
     chunks = {}
 
     for filename in filenames:
@@ -50,50 +52,37 @@ def load_chunked_data_npy():
             chunks[chunk_index].setdefault(data_type, []).append(filename)
     chunks_list = list(chunks.values())
 
-    loaded_chunk_data_org = [chunk_to_list(chunk_dict) for chunk_dict in chunks_list]
+    loaded_chunk_data = [chunk_to_list(chunk_dict) for chunk_dict in chunks_list]
     # tylko 1/2 danych
-    subarray_length = len(loaded_chunk_data_org) // 2
-    start_index = len(loaded_chunk_data_org) // 2  # Choosing the middle as the starting index, you can choose any other valid index as well
-
-    loaded_chunk_data = loaded_chunk_data_org[start_index:start_index + subarray_length]
+    # subarray_length = len(loaded_chunk_data_org) // 4
+    # start_index = len(loaded_chunk_data_org) // 2  # Choosing the middle as the starting index, you can choose any other valid index as well
+    #
+    # loaded_chunk_data = loaded_chunk_data_org[start_index:start_index + subarray_length]
 
     #tylko reflektancje w osi X
-    #X_data = np.array([sublist for object_data in loaded_chunk_data for sublist in object_data[3]])
+    X_data = np.array([sublist for object_data in loaded_chunk_data for sublist in object_data[2]])
 
     # (X,Y) w X_data
-    reflectances = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
-    wavelengths = loaded_chunk_data[0][2][0]
-    X_data = np.empty((len(reflectances), len(reflectances[0]), 2))
-    for i, reflectance in enumerate(reflectances):
-        X_data[i, :, 0] = wavelengths  # Assign wavelengths to the first column
-        X_data[i, :, 1] = reflectance
+    # reflectances = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
+    # wavelengths = loaded_chunk_data[0][2][0]
+    # X_data = np.empty((len(reflectances), len(reflectances[0]), 2))
+    # for i, reflectance in enumerate(reflectances):
+    #     X_data[i, :, 0] = wavelengths  # Assign wavelengths to the first column
+    #     X_data[i, :, 1] = reflectance
 
     # wszystko w y_data
-    n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[0]])
-    periods = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
-    Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
-    delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[5]])
-    y_data = np.array(
-        [np.array([n_effs[i], periods[i], Xzs[i], delta_n_effs[i]]) for i in range(len(n_effs))])
+    # n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[0]])
+    # periods = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+    # Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
+    delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
+    # y_data = np.array([np.concatenate((
+    #              value,
+    #              periods[i],
+    #              Xzs[i],
+    #              delta_n_effs[i]
+    #          )) for i, value in enumerate(n_effs)])
+    y_data = delta_n_effs
     return X_data, y_data
-
-
-def load_data_from_jsons():
-    try:
-        np_new_load = lambda *a, **k: np.load(*a, allow_pickle=True, **k)
-        filenames = [name for name in os.listdir(DATA_MODEL_NON_UNIFORM_1_MLN) if name.find('.npy')]
-        first_file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filenames[0])
-        data = np_new_load(first_file_path)
-        # for filename in filenames[1:]:
-        filename = filenames[1]
-        file_path = os.path.join(DATA_MODEL_NON_UNIFORM_1_MLN, filename)
-        array = np_new_load(file_path)
-        data = np.concatenate((data, array), axis=0)
-        del array
-        return data
-    except Exception as e:
-        print(e)
-        print(f"Data setup error: {e}")
 
 
 def load_training_config():
@@ -132,7 +121,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": "bilstm, gauss"
+            "note": "normalna siec, na wyjsciu sa periods, ale przeskalowane"
         }
 
         output_results = {

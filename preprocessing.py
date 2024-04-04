@@ -68,24 +68,27 @@ def data_setup():
         # y_train = np.round(y_train, 3)
         # y_test = np.round(y_test, 3)
 
-        y_test_rounded = []
-        for sublist in y_test:
-            rounded_first = np.round(sublist[0], 3)
-            rounded_third = np.round(sublist[2], 3)
-            y_test_rounded.append(np.array([rounded_first, sublist[1], rounded_third, sublist[3]]))
-        y_test_rounded = np.reshape(np.array(y_test_rounded), (-1, 1, 4, 15))
+        # y_test_rounded = []
+        # for sublist in y_test:
+        #     rounded_first = np.round(sublist[0], 3)
+        #     rounded_third = np.round(sublist[2], 3)
+        #     y_test_rounded.append(np.array([rounded_first, sublist[1], rounded_third, sublist[3]]))
+        # y_test_rounded = np.reshape(np.array(y_test_rounded), (-1, 1, 4, 15))
+        #
+        # y_train_rounded = []
+        # for sublist in y_train:
+        #     rounded_first = np.round(sublist[0], 3)
+        #     rounded_third = np.round(sublist[2], 3)
+        #     y_train_rounded.append(np.array([rounded_first, sublist[1], rounded_third, sublist[3]]))
+        # y_train_rounded = np.reshape(np.array(y_train_rounded), (-1, 1, 4, 15))
 
-        y_train_rounded = []
-        for sublist in y_train:
-            rounded_first = np.round(sublist[0], 3)
-            rounded_third = np.round(sublist[2], 3)
-            y_train_rounded.append(np.array([rounded_first, sublist[1], rounded_third, sublist[3]]))
-        y_train_rounded = np.reshape(np.array(y_train_rounded), (-1, 1, 4, 15))
+        #y_test_rounded = np.reshape(np.array(y_test), (-1, 1, 15))
+        #y_train_rounded = np.reshape(np.array(y_train), (-1, 1, 15))
 
         # SECTION: dla bilstm + tylko reflektancje
         # X_train_reshaped = X_train_scaled.reshape(-1, 1, 300)
         # X_test_reshaped = X_test_scaled.reshape(-1, 1, 300)
-        return X_test, X_train_scaled, X_test_scaled, y_train_rounded, y_test_rounded
+        return X_test, X_train_scaled, X_test_scaled, y_train, y_test
         # return X_test, X_train_scaled, X_test_scaled, y_train, y_test
     except Exception:
         print("Data setup error")
