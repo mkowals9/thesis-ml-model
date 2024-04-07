@@ -124,9 +124,10 @@ def perform_after_training_actions(X_test, X_test_reshaped, X_train_reshaped, hi
         ct = datetime.datetime.now().timestamp()
         ct = str(ct).replace(".", "_")
         save_training_stats_as_plots_in_files(epochs_range, model_metrics, ct, training_config["save_plots"])
-        plot_plots_from_coefficients(y_predicted, y_test, ct, training_config["save_plots"])
+        #jak mamy a, b, c, d
+        #plot_plots_from_coefficients(y_predicted, y_test, ct, training_config["save_plots"])
         #jak mamy n_eff, delta_n_eff, itd
-        #plot_predicted_actual_many_arrays_values(y_predicted, y_test, ct, training_config["save_plots"], param_name)
+        plot_predicted_actual_many_arrays_values(y_predicted, y_test, ct, training_config["save_plots"], param_name)
 
         print("~ ~ Saving to files predictions and models ~ ~")
         save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, neural_network)
@@ -146,8 +147,12 @@ if __name__ == "__main__":
     env_setup()
     # run_training_with_callbacks("coefficients", 2)
     # run_training_without_callbacks("coefficients", 2)
-    run_training_with_callbacks("coefficients", 1)
-    # run_training_with_callbacks("all", 1)
+    #run_training_with_callbacks("coefficients", 1)
+
+    run_training_with_callbacks("all", 1)
+    run_training_without_callbacks("all", 1)
+    run_training_without_callbacks("all", 2)
+
     # run_training_with_callbacks("period", 2)
     # run_training_with_callbacks("Xz", 2)
     # run_training_with_callbacks("n_eff", 2)

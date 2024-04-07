@@ -2,7 +2,7 @@ import keras
 from keras import Input, regularizers
 from keras.models import Sequential
 from keras.src.layers import Dropout
-from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Reshape
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense
 
 
 class CnnModel:
@@ -44,6 +44,6 @@ class CnnModel:
         # self.input_shape = (1600, 1)
         self.input_shape = (300, 2)
         self.model = None
-        self.output_dim = 16
+        self.output_dim = 60
         self.create_standard_model()
         self.model_name = "cnn_model"

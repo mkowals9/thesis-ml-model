@@ -12,6 +12,7 @@ DATA_MODEL_FIRST_PARABOLIC = '/home/marcelina/Documents/misc/model_inputs/parabo
 DATA_MODEL_PARABOLIC_SCALED = '/home/marcelina/Documents/misc/model_inputs/parabol_different_scales'
 DATA_MODEL_POLYNOMIAL_MIXED = '/home/marcelina/Documents/misc/model_inputs/polynomial_2_3_first_mixed'
 DATA_MODEL_COEFFICIENTS = '/home/marcelina/Documents/misc/model_inputs/new_coef'
+DATA_MODEL_POLYNOMIAL_MIXED_TOTAL_RANDOM = '/home/marcelina/Documents/misc/model_inputs/polynomial_2_3_all_random_coef'
 
 TRAINING_CONFIG_JSON = './training_config.json'
 
@@ -49,7 +50,23 @@ def coefficients_in_chunk_to_list(chunk_dict, folder_name):
 
 def load_chunked_data_npy(param_name: str):
 
-    folder_name = DATA_MODEL_COEFFICIENTS
+    folder_name = DATA_MODEL_POLYNOMIAL_MIXED_TOTAL_RANDOM
+
+    # KOD JAK CHCEMY NA WYJSCIU MIEC TYLKO A, B, C, D
+    # filenames = os.listdir(folder_name)
+    # chunks = {}
+    #
+    # for filename in filenames:
+    #     chunk_index = extract_chunk_index(filename)
+    #     if chunk_index is not None:
+    #         data_type = re.search(r'model_input_(\w+)_chunk', filename).group(1)
+    #         if chunk_index not in chunks:
+    #             chunks[chunk_index] = {}
+    #         chunks[chunk_index].setdefault(data_type, []).append(filename)
+    # chunks_list = list(chunks.values())
+    # loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+
+    # folder_name = DATA_MODEL_PARABOLIC_SCALED
 
     filenames = os.listdir(folder_name)
     chunks = {}
@@ -62,23 +79,7 @@ def load_chunked_data_npy(param_name: str):
                 chunks[chunk_index] = {}
             chunks[chunk_index].setdefault(data_type, []).append(filename)
     chunks_list = list(chunks.values())
-    loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
-
-    # folder_name = DATA_MODEL_PARABOLIC_SCALED
-    #
-    # filenames = os.listdir(folder_name)
-    # chunks = {}
-    #
-    # for filename in filenames:
-    #     chunk_index = extract_chunk_index(filename)
-    #     if chunk_index is not None:
-    #         data_type = re.search(r'model_input_(\w+)_chunk', filename).group(1)
-    #         if chunk_index not in chunks:
-    #             chunks[chunk_index] = {}
-    #         chunks[chunk_index].setdefault(data_type, []).append(filename)
-    # chunks_list = list(chunks.values())
-#    loaded_chunk_data_2 = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
-#    loaded_chunk_data.extend(loaded_chunk_data_2)
+    loaded_chunk_data = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
 
     # tylko 1/2 danych
     # subarray_length = len(loaded_chunk_data_org) // 4
@@ -114,8 +115,8 @@ def load_chunked_data_npy(param_name: str):
         coefficients = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
         y_data = coefficients
     else:
-        n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[0]])
-        periods = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+        n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+        periods = np.array([val for object_data in loaded_chunk_data for val in object_data[2]])
         Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
         delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
         y_data = np.array([np.concatenate((
