@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 import os
 import scipy
 
-from save_read_files import load_data_from_jsons, load_chunked_data_npy
+from save_read_files import load_chunked_data_npy
 
 TRAINING_CONFIG_JSON = './training_config.json'
 
@@ -44,7 +44,8 @@ def scaling_Xs_wavelength_reflectance(X_train, X_test):
 
 def divide_input_data(data):
     try:
-        X_train, X_test, y_train, y_test = train_test_split(data[0], data[1], test_size=0.15, random_state=4280)
+        X_train, X_test, y_train, y_test = train_test_split(data[0], data[1],
+                                                            test_size=0.15, random_state=11235813)
         return X_train, X_test, y_train, y_test
     except Exception as e:
         print(f"Divide input data error: {e}")
@@ -59,9 +60,9 @@ def perform_find_peaks(X_array):
     return [sublist1 + sublist2 for sublist1, sublist2 in zip(elements1, elements2)]
 
 
-def data_setup():
+def data_setup(param_name: str):
     try:
-        data = load_chunked_data_npy()
+        data = load_chunked_data_npy(param_name)
         (X_train, X_test, y_train, y_test) = divide_input_data(data)
         (X_train_scaled, X_test_scaled) = scaling_Xs_wavelength_reflectance(X_train, X_test)
 

@@ -1,5 +1,5 @@
 import keras
-from keras import Input
+from keras import Input, regularizers
 from keras.models import Sequential
 from keras.src.layers import Dropout
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Reshape
@@ -10,7 +10,7 @@ class CnnModel:
     def create_standard_model(self):
         model = Sequential([
             Input(shape=self.input_shape),
-            Conv1D(filters=40, kernel_size=2, activation='relu'),  # 64
+            Conv1D(filters=50, kernel_size=2, activation='relu'),  # 64
             MaxPooling1D(pool_size=2),
             Conv1D(filters=32, kernel_size=2, activation='relu'),  # 40
             MaxPooling1D(pool_size=2),
@@ -22,14 +22,16 @@ class CnnModel:
             MaxPooling1D(pool_size=2),
             Dropout(0.1),
             Flatten(),
-            Dense(self.output_dim, activation='linear')
+            Dense(self.output_dim, activation='relu'),
+            Dense(self.output_dim, activation='linear', kernel_regularizer=regularizers.l2(0.0001))
         ])
 
-        mean_squared_error = keras.metrics.MeanSquaredError()
+        # mean_squared_error = keras.metrics.MeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
-        #mean_absolute_percentage_error = keras.metrics.MeanAbsolutePercentageError()
+        root_mean_squared_error = keras.metrics.RootMeanSquaredError()
+        # mean_absolute_percentage_error = keras.metrics.MeanAbsolutePercentageError()
         model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.0007, epsilon=6e-7),
-                      metrics=[mean_squared_error, mean_absolute_error],
+                      metrics=[root_mean_squared_error, mean_absolute_error],
                       loss='mean_squared_error')
         model.summary()
 
@@ -42,6 +44,6 @@ class CnnModel:
         # self.input_shape = (1600, 1)
         self.input_shape = (300, 2)
         self.model = None
-        self.output_dim = 15
+        self.output_dim = 16
         self.create_standard_model()
         self.model_name = "cnn_model"

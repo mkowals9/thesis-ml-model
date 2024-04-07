@@ -2,7 +2,6 @@ import json
 import re
 import os
 import numpy as np
-import math
 
 DATA_MODEL_NON_UNIFORM_1_MLN = '/home/marcelina/Documents/misc/model_inputs/non_uniform/npys'
 DATA_MODEL_1ST_CHUNKED = '/home/marcelina/Documents/misc/model_inputs/pierwsze_chunked_data'
@@ -11,6 +10,8 @@ DATA_MODEL_CORRECT_GAUSS = '/home/marcelina/Documents/misc/model_inputs/gauss_co
 DATA_MODEL_GAUSS_MORE_RANDOM = '/home/marcelina/Documents/misc/model_inputs/gauss_more_random'
 DATA_MODEL_FIRST_PARABOLIC = '/home/marcelina/Documents/misc/model_inputs/parabolic_first'
 DATA_MODEL_PARABOLIC_SCALED = '/home/marcelina/Documents/misc/model_inputs/parabol_different_scales'
+DATA_MODEL_POLYNOMIAL_MIXED = '/home/marcelina/Documents/misc/model_inputs/polynomial_2_3_first_mixed'
+DATA_MODEL_COEFFICIENTS = '/home/marcelina/Documents/misc/model_inputs/new_coef'
 
 TRAINING_CONFIG_JSON = './training_config.json'
 
@@ -27,20 +28,30 @@ def extract_chunk_index(filename):
         return None
 
 
-def chunk_to_list(chunk_dict):
+def parameters_in_chunk_to_list(chunk_dict, folder_name):
     np_new_load = lambda *a, **k: np.load(*a, allow_pickle=True, **k)
-    X_z = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["X_z"][0]))
-    delta_n_eff = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["delta_n_eff"][0]))
-    n_eff = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["n_eff"][0]))
-    period = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["period"][0]))
-    reflectances = np_new_load(os.path.join(DATA_MODEL_PARABOLIC_SCALED, chunk_dict["reflectances"][0]))
+    X_z = np_new_load(os.path.join(folder_name, chunk_dict["X_z"][0]))
+    delta_n_eff = np_new_load(os.path.join(folder_name, chunk_dict["delta_n_eff"][0]))
+    n_eff = np_new_load(os.path.join(folder_name, chunk_dict["n_eff"][0]))
+    period = np_new_load(os.path.join(folder_name, chunk_dict["period"][0]))
+    reflectances = np_new_load(os.path.join(folder_name, chunk_dict["reflectances"][0]))
     #reflectances = convert_to_decibels(bare_ref)
     #wavelengths = np_new_load(os.path.join(DATA_MODEL_FIRST_PARABOLIC, chunk_dict["wavelengths"][0]))
-    return n_eff, period, reflectances, X_z, delta_n_eff
+    return reflectances, n_eff, period, X_z, delta_n_eff
+
+def coefficients_in_chunk_to_list(chunk_dict, folder_name):
+    np_new_load = lambda *a, **k: np.load(*a, allow_pickle=True, **k)
+    coefficients = np_new_load(os.path.join(folder_name, chunk_dict["coefficients"][0]))
+    reflectances = np_new_load(os.path.join(folder_name, chunk_dict["reflectances"][0]))
+    #wavelengths = np_new_load(os.path.join(DATA_MODEL_FIRST_PARABOLIC, chunk_dict["wavelengths"][0]))
+    return reflectances, coefficients
 
 
-def load_chunked_data_npy():
-    filenames = os.listdir(DATA_MODEL_PARABOLIC_SCALED)
+def load_chunked_data_npy(param_name: str):
+
+    folder_name = DATA_MODEL_COEFFICIENTS
+
+    filenames = os.listdir(folder_name)
     chunks = {}
 
     for filename in filenames:
@@ -51,8 +62,24 @@ def load_chunked_data_npy():
                 chunks[chunk_index] = {}
             chunks[chunk_index].setdefault(data_type, []).append(filename)
     chunks_list = list(chunks.values())
+    loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
 
-    loaded_chunk_data = [chunk_to_list(chunk_dict) for chunk_dict in chunks_list]
+    # folder_name = DATA_MODEL_PARABOLIC_SCALED
+    #
+    # filenames = os.listdir(folder_name)
+    # chunks = {}
+    #
+    # for filename in filenames:
+    #     chunk_index = extract_chunk_index(filename)
+    #     if chunk_index is not None:
+    #         data_type = re.search(r'model_input_(\w+)_chunk', filename).group(1)
+    #         if chunk_index not in chunks:
+    #             chunks[chunk_index] = {}
+    #         chunks[chunk_index].setdefault(data_type, []).append(filename)
+    # chunks_list = list(chunks.values())
+#    loaded_chunk_data_2 = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+#    loaded_chunk_data.extend(loaded_chunk_data_2)
+
     # tylko 1/2 danych
     # subarray_length = len(loaded_chunk_data_org) // 4
     # start_index = len(loaded_chunk_data_org) // 2  # Choosing the middle as the starting index, you can choose any other valid index as well
@@ -60,7 +87,7 @@ def load_chunked_data_npy():
     # loaded_chunk_data = loaded_chunk_data_org[start_index:start_index + subarray_length]
 
     #tylko reflektancje w osi X
-    X_data = np.array([sublist for object_data in loaded_chunk_data for sublist in object_data[2]])
+    X_data = np.array([sublist for object_data in loaded_chunk_data for sublist in object_data[0]])
 
     # (X,Y) w X_data
     # reflectances = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
@@ -71,17 +98,32 @@ def load_chunked_data_npy():
     #     X_data[i, :, 1] = reflectance
 
     # wszystko w y_data
-    # n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[0]])
-    # periods = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
-    # Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
-    delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
-    # y_data = np.array([np.concatenate((
-    #              value,
-    #              periods[i],
-    #              Xzs[i],
-    #              delta_n_effs[i]
-    #          )) for i, value in enumerate(n_effs)])
-    y_data = delta_n_effs
+    if param_name == "n_eff":
+        n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+        y_data = n_effs
+    elif param_name == "period":
+        periods = np.array([val for object_data in loaded_chunk_data for val in object_data[2]])
+        y_data = periods
+    elif param_name == "Xz":
+        Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
+        y_data = Xzs
+    elif param_name == "delta_n_eff":
+        delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
+        y_data = delta_n_effs
+    elif param_name == "coefficients":
+        coefficients = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+        y_data = coefficients
+    else:
+        n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[0]])
+        periods = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+        Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
+        delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
+        y_data = np.array([np.concatenate((
+                     value,
+                     periods[i],
+                     Xzs[i],
+                     delta_n_effs[i]
+                 )) for i, value in enumerate(n_effs)])
     return X_data, y_data
 
 
@@ -121,7 +163,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": "normalna siec, na wyjsciu sa periods, ale przeskalowane"
+            "note": f"{nn_trained.model_name} siec, przeskalowane, tylko coeff"
         }
 
         output_results = {
