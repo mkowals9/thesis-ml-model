@@ -53,7 +53,7 @@ class BasicDenseModel:
         # self.input_shape = (1600, 1)
         # self.input_shape = (1, 300) <- jak mamy tylko [[y1, y2] .. ]
         self.input_shape = (300, 2)
-        self.output_dim = 60
+        self.output_dim = 15
         self.model = None
         self.create_standard_model()
         self.model_name = "basic_dense_model"

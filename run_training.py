@@ -7,7 +7,7 @@ from models_classes.basic_dense_model import BasicDenseModel
 from models_classes.lstm_model import LstmModel
 from models_classes.cnn_model import CnnModel
 from plots import save_training_stats_as_plots_in_files, plot_predicted_actual_single_array_values, \
-    plot_predicted_actual_many_arrays_values, plot_plots_from_coefficients
+    separate_predicted_actual_values_from_one_array_and_plot, plot_from_coefficients
 from preprocessing import env_setup, data_setup
 from save_read_files import load_training_config, save_all_to_files
 import numpy as np
@@ -126,8 +126,12 @@ def perform_after_training_actions(X_test, X_test_reshaped, X_train_reshaped, hi
         save_training_stats_as_plots_in_files(epochs_range, model_metrics, ct, training_config["save_plots"])
         #jak mamy a, b, c, d
         #plot_plots_from_coefficients(y_predicted, y_test, ct, training_config["save_plots"])
-        #jak mamy n_eff, delta_n_eff, itd
-        plot_predicted_actual_many_arrays_values(y_predicted, y_test, ct, training_config["save_plots"], param_name)
+
+        #jak mamy n_eff, delta_n_eff, itd w jednym
+        #plot_predicted_actual_many_arrays_values(y_predicted, y_test, ct, training_config["save_plots"], param_name)
+
+        #jak mamy tylko n_eff lub delta_n_eff
+        plot_predicted_actual_single_array_values(y_predicted, y_test, ct, param_name, training_config["save_plots"])
 
         print("~ ~ Saving to files predictions and models ~ ~")
         save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, neural_network)
@@ -149,9 +153,16 @@ if __name__ == "__main__":
     # run_training_without_callbacks("coefficients", 2)
     #run_training_with_callbacks("coefficients", 1)
 
-    run_training_with_callbacks("all", 1)
-    run_training_without_callbacks("all", 1)
-    run_training_without_callbacks("all", 2)
+    #run_training_without_callbacks("n_eff", 1)
+    #run_training_without_callbacks("n_eff", 2)
+    #run_training_without_callbacks("X_z", 1)
+    #run_training_without_callbacks("X_z", 2)
+
+    #run_training_without_callbacks("delta_n_eff", 1)
+    #run_training_without_callbacks("delta_n_eff", 2)
+    #do skonczenia period, ale jest duzy blad, na poziomie 18
+    run_training_without_callbacks("period", 1)
+    run_training_without_callbacks("period", 2)
 
     # run_training_with_callbacks("period", 2)
     # run_training_with_callbacks("Xz", 2)
