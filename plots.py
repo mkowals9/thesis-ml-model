@@ -34,20 +34,20 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
             plt.clf()
 
         # Plot training and validation mse
-        # plt.plot(epochs_range, metrics.mean_squared_error, label='Training MSE')
-        # plt.plot(epochs_range, metrics.val_mean_squared_error, label='Validation MSE')
-        # plt.yscale('log')
-        # plt.xlabel('Epochs')
-        # plt.ylabel('MSE')
-        # plt.title('Training and Validation MSE')
-        # plt.legend()
-        # plt.grid(True)
-        # if save_plots:
-        #     plt.savefig(f'./trainings/{ct}/mse_{ct}.png')
-        #     plt.clf()
-        # else:
-        #     plt.show()
-        #     plt.clf()
+        plt.plot(epochs_range, metrics.mean_squared_error, label='Training MSE')
+        plt.plot(epochs_range, metrics.val_mean_squared_error, label='Validation MSE')
+        plt.yscale('log')
+        plt.xlabel('Epochs')
+        plt.ylabel('MSE')
+        plt.title('Training and Validation MSE')
+        plt.legend()
+        plt.grid(True)
+        if save_plots:
+            plt.savefig(f'./trainings/{ct}/mse_{ct}.png')
+            plt.clf()
+        else:
+            plt.show()
+            plt.clf()
 
         # Plot training and validation mae
         plt.plot(epochs_range, metrics.mean_absolute_error, label='Training MAE')
@@ -86,7 +86,7 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
         print(f"An error has occurred during plots creation: {e}")
 
 
-# tylko jesli mamy jeden parametr na wyjsciu, dlugosc jest rowna liczbie sekcji
+# only one parameter on the output, the length = number of sections
 def plot_predicted_actual_single_array_values(y_predicted, y_actual, ct, param_name, save_plots=False):
     try:
         random_values = random.sample(range(0, len(y_predicted)), 3)
@@ -109,7 +109,7 @@ def plot_predicted_actual_single_array_values(y_predicted, y_actual, ct, param_n
         print(f"Param plots {param_name} from single array error: {e}")
 
 
-# jeśli mamy array wynikowy o długości 60, czyli 4 parametry po 15
+# output array has length 60, so 4 parameters with 15 values
 def separate_predicted_actual_values_from_one_array_and_plot(y_predicted, y_actual, ct, save_plots=False,
                                                              param_name="n_eff"):
     try:
@@ -141,7 +141,7 @@ def separate_predicted_actual_values_from_one_array_and_plot(y_predicted, y_actu
         print(f"Param plots from one big array error: {e}")
 
 
-# jeśli mamy array wynikowy o długości 60, czyli 4 parametry po 15
+# output array of length 60, so 4 parameters with 15 values
 def plot_actual_predicted_for_param_from_one_big_param_array(ct, example_index, save_plots, sections, y_actual,
                                                              y_pred_matched, param_index, param_name):
     try:
@@ -195,7 +195,7 @@ def plot_from_coefficients(y_predicted, y_test, ct, save_plots):
     try:
         random_values = random.sample(range(0, len(y_predicted)), 10)
         sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
-        L = 4e-3 * 1e3
+        L = 4e-3 * 1e3  # change if the L changes in data generation
         x_values = np.linspace(-L / 2, L / 2, 15)
         for example_index in random_values:
             y_pred = y_predicted[example_index]

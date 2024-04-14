@@ -32,11 +32,9 @@ def scaling_Xs_only_reflectance(X_train, X_test):
 def scaling_Xs_wavelength_reflectance(X_train, X_test):
     scaler = StandardScaler()
 
-    # Flatten and concatenate the training data for fitting the scaler
     X_train_concatenated = np.concatenate([X.flatten() for X in X_train]).reshape(-1, 1)
     scaler.fit(X_train_concatenated)
 
-    # Transform both training and testing data using the fitted scaler
     X_train_scaled = np.array([scaler.transform(X.flatten().reshape(-1, 1)).reshape(X.shape) for X in X_train])
     X_test_scaled = np.array([scaler.transform(X.flatten().reshape(-1, 1)).reshape(X.shape) for X in X_test])
     return X_train_scaled, X_test_scaled
@@ -86,10 +84,10 @@ def data_setup(param_name: str):
         #y_test_rounded = np.reshape(np.array(y_test), (-1, 1, 15))
         #y_train_rounded = np.reshape(np.array(y_train), (-1, 1, 15))
 
-        # SECTION: dla bilstm + tylko reflektancje
+        # SECTION: only bilstm + only reflectances
         # X_train_reshaped = X_train_scaled.reshape(-1, 1, 300)
         # X_test_reshaped = X_test_scaled.reshape(-1, 1, 300)
         return X_test, X_train_scaled, X_test_scaled, y_train, y_test
         # return X_test, X_train_scaled, X_test_scaled, y_train, y_test
-    except Exception:
-        print("Data setup error")
+    except Exception as e:
+        print(f"Data setup error : {e}")

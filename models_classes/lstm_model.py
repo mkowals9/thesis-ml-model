@@ -1,8 +1,8 @@
 import keras
 from keras import Input
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, Bidirectional
-from keras.src.layers import Reshape
+from keras.layers import Dense, LSTM
+from keras.src.layers import Dropout, Reshape, Flatten
 
 
 class LstmModel:
@@ -10,21 +10,27 @@ class LstmModel:
     def create_standard_model(self):
 
         model = Sequential([
-            LSTM(300, activation='relu', return_sequences=True, input_shape=self.input_shape),
-            # Dropout(rate=0.5),
-            LSTM(200, activation='relu', return_sequences=True),
-            # Dropout(rate=0.2),
-            LSTM(200, activation='relu', return_sequences=False),
-            Dense(150, activation='relu'),
-            Dense(15, activation='relu'),
-            Dense(15, activation='linear'),
+            Input(shape=self.input_shape),
+            LSTM(100, activation='relu', return_sequences=True),
+            Dropout(rate=0.5),
+            LSTM(50, activation='relu', return_sequences=True),
+            Dropout(rate=0.5),
+            Dense(50, activation='relu'),
+            Dense(self.output_dim+20, activation='relu'),
+            Dense(self.output_dim+20, activation='linear'),
+            Reshape((-1, self.output_dim)),
+            Flatten(),
+            Dense(self.output_dim, activation='relu'),
+            Dense(self.output_dim, activation='relu'),
+
         ])
 
         mean_squared_error = keras.metrics.MeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001, epsilon=1e-6),
-                      metrics=[mean_squared_error, mean_absolute_error],
-                      loss='mean_squared_error')
+        root_mean_squared_error = keras.metrics.RootMeanSquaredError()
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.00001, epsilon=1e-7),
+                      metrics=[mean_squared_error, mean_absolute_error, root_mean_squared_error],
+                      loss='mean_absolute_error')
         model.summary()
 
         self.model = model
@@ -34,8 +40,8 @@ class LstmModel:
         # input_shape = (800, 1)
         # shape of initial is n,800,2 [[x1, y1], .. ]
         # self.input_shape = (1600, 1)
-        self.input_shape = (1, 300,)
-        # self.output_dim = 4
+        self.input_shape = (300, 2)
+        self.output_dim = 16
         self.model = None
         self.create_standard_model()
         self.model_name = "lstm_model"

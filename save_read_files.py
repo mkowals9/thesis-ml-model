@@ -36,38 +36,23 @@ def parameters_in_chunk_to_list(chunk_dict, folder_name):
     n_eff = np_new_load(os.path.join(folder_name, chunk_dict["n_eff"][0]))
     period = np_new_load(os.path.join(folder_name, chunk_dict["period"][0]))
     reflectances = np_new_load(os.path.join(folder_name, chunk_dict["reflectances"][0]))
-    #reflectances = convert_to_decibels(bare_ref)
-    #wavelengths = np_new_load(os.path.join(DATA_MODEL_FIRST_PARABOLIC, chunk_dict["wavelengths"][0]))
+    # reflectances = convert_to_decibels(bare_ref)
+    # wavelengths = np_new_load(os.path.join(DATA_MODEL_FIRST_PARABOLIC, chunk_dict["wavelengths"][0]))
     return reflectances, n_eff, period, X_z, delta_n_eff
+
 
 def coefficients_in_chunk_to_list(chunk_dict, folder_name):
     np_new_load = lambda *a, **k: np.load(*a, allow_pickle=True, **k)
     coefficients = np_new_load(os.path.join(folder_name, chunk_dict["coefficients"][0]))
     reflectances = np_new_load(os.path.join(folder_name, chunk_dict["reflectances"][0]))
-    #wavelengths = np_new_load(os.path.join(DATA_MODEL_FIRST_PARABOLIC, chunk_dict["wavelengths"][0]))
+    # wavelengths = np_new_load(os.path.join(DATA_MODEL_FIRST_PARABOLIC, chunk_dict["wavelengths"][0]))
     return reflectances, coefficients
 
 
 def load_chunked_data_npy(param_name: str):
+    folder_name = DATA_MODEL_COEFFICIENTS
 
-    folder_name = DATA_MODEL_POLYNOMIAL_MIXED_TOTAL_RANDOM
-
-    # KOD JAK CHCEMY NA WYJSCIU MIEC TYLKO A, B, C, D
-    # filenames = os.listdir(folder_name)
-    # chunks = {}
-    #
-    # for filename in filenames:
-    #     chunk_index = extract_chunk_index(filename)
-    #     if chunk_index is not None:
-    #         data_type = re.search(r'model_input_(\w+)_chunk', filename).group(1)
-    #         if chunk_index not in chunks:
-    #             chunks[chunk_index] = {}
-    #         chunks[chunk_index].setdefault(data_type, []).append(filename)
-    # chunks_list = list(chunks.values())
-    # loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
-
-    # folder_name = DATA_MODEL_PARABOLIC_SCALED
-
+    # CODE IF WE WANT TO HAVE AS THE OUTPUT A, B, C, D
     filenames = os.listdir(folder_name)
     chunks = {}
 
@@ -79,11 +64,26 @@ def load_chunked_data_npy(param_name: str):
                 chunks[chunk_index] = {}
             chunks[chunk_index].setdefault(data_type, []).append(filename)
     chunks_list = list(chunks.values())
-    loaded_chunk_data = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+    loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
 
-    # tylko 1/2 danych
+    # folder_name = DATA_MODEL_PARABOLIC_SCALED
+
+    # filenames = os.listdir(folder_name)
+    # chunks = {}
+    #
+    # for filename in filenames:
+    #     chunk_index = extract_chunk_index(filename)
+    #     if chunk_index is not None:
+    #         data_type = re.search(r'model_input_(\w+)_chunk', filename).group(1)
+    #         if chunk_index not in chunks:
+    #             chunks[chunk_index] = {}
+    #         chunks[chunk_index].setdefault(data_type, []).append(filename)
+    # chunks_list = list(chunks.values())
+    # loaded_chunk_data = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+
+    # ONLY 1/2 OF ALL DATA
     # subarray_length = len(loaded_chunk_data_org) // 4
-    # start_index = len(loaded_chunk_data_org) // 2  # Choosing the middle as the starting index, you can choose any other valid index as well
+    # start_index = len(loaded_chunk_data_org) // 2
     #
     # loaded_chunk_data = loaded_chunk_data_org[start_index:start_index + subarray_length]
 
@@ -95,10 +95,10 @@ def load_chunked_data_npy(param_name: str):
     # wavelengths = loaded_chunk_data[0][2][0]
     # X_data = np.empty((len(reflectances), len(reflectances[0]), 2))
     # for i, reflectance in enumerate(reflectances):
-    #     X_data[i, :, 0] = wavelengths  # Assign wavelengths to the first column
+    #     X_data[i, :, 0] = wavelengths
     #     X_data[i, :, 1] = reflectance
 
-    # wszystko w y_data
+    # EVERYTHING IN Y_DATA
     if param_name == "n_eff":
         n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
         y_data = n_effs
@@ -112,7 +112,7 @@ def load_chunked_data_npy(param_name: str):
         delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
         y_data = delta_n_effs
     elif param_name == "coefficients":
-        coefficients = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
+        coefficients = np.array([np.round(val, 4) for object_data in loaded_chunk_data for val in object_data[1]])
         y_data = coefficients
     else:
         n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[1]])
@@ -120,11 +120,11 @@ def load_chunked_data_npy(param_name: str):
         Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
         delta_n_effs = np.array([val for object_data in loaded_chunk_data for val in object_data[4]])
         y_data = np.array([np.concatenate((
-                     value,
-                     periods[i],
-                     Xzs[i],
-                     delta_n_effs[i]
-                 )) for i, value in enumerate(n_effs)])
+            value,
+            periods[i],
+            Xzs[i],
+            delta_n_effs[i]
+        )) for i, value in enumerate(n_effs)])
     return X_data, y_data
 
 
