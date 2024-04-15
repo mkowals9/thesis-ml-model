@@ -1,7 +1,6 @@
 import keras
 from keras import Input, regularizers
 from keras.models import Sequential
-from keras.src.layers import Dropout
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense
 
 

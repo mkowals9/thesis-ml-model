@@ -3,20 +3,29 @@ import datetime
 from sklearn.model_selection import KFold
 from keras.src.callbacks import EarlyStopping
 from metrics import Metrics
-from models_classes.basic_dense_model import BasicDenseModel
-from models_classes.lstm_model import LstmModel
-from models_classes.cnn_model import CnnModel
+from model_classes.basic_dense_model import BasicDenseModel
+from model_classes.gru_model import GruModel
+from model_classes.lstm_model import LstmModel
+from model_classes.cnn_model import CnnModel
 from plots import save_training_stats_as_plots_in_files, plot_predicted_actual_single_array_values, \
-    separate_predicted_actual_values_from_one_array_and_plot, plot_from_coefficients
+    separate_predicted_actual_values_from_one_array_and_plot, plot_from_coefficients, \
+    plot_actual_predicted_for_param_from_one_big_param_array
 from preprocessing import env_setup, data_setup
 from save_read_files import load_training_config, save_all_to_files
 import numpy as np
 
 
-def run_training_with_callbacks_and_k_folds():
-    neural_network = BasicDenseModel()
+def run_training_with_callbacks_and_k_folds(param_name: str, model_index: int):
+    if model_index == 1:
+        neural_network = BasicDenseModel()
+    elif model_index == 2:
+        neural_network = CnnModel()
+    elif model_index == 3:
+        neural_network = LstmModel()
+    elif model_index == 4:
+        neural_network = GruModel()
 
-    X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data()
+    X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data(param_name)
 
     early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='auto')
     early_stopping_val_loss = EarlyStopping(monitor='val_loss', patience=5, verbose=1, mode='auto')
@@ -65,6 +74,8 @@ def run_training_with_callbacks(param_name: str, model_index: int):
         neural_network = CnnModel()
     elif model_index == 3:
         neural_network = LstmModel()
+    elif model_index == 4:
+        neural_network = GruModel()
     X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data(param_name)
 
     early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='auto')
@@ -92,6 +103,8 @@ def run_training_without_callbacks(param_name: str, model_index: int):
         neural_network = CnnModel()
     elif model_index == 3:
         neural_network = LstmModel()
+    elif model_index == 4:
+        neural_network = GruModel()
     X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data(param_name)
 
     print("~ ~ Training start ~ ~")
@@ -128,13 +141,17 @@ def perform_after_training_actions(X_test, X_test_reshaped, X_train_reshaped, hi
         save_training_stats_as_plots_in_files(epochs_range, model_metrics, ct, training_config["save_plots"])
 
         # when we have coefficients a, b, c, d
-        plot_from_coefficients(y_predicted, y_test, ct, training_config["save_plots"])
+        if param_name == "coefficients":
+            plot_from_coefficients(y_predicted, y_test, ct, training_config["save_plots"])
 
         # when we have n_eff, delta_n_eff, etc. in one
-        # plot_predicted_actual_many_arrays_values(y_predicted, y_test, ct, training_config["save_plots"], param_name)
-
-        # when we have only one parameter as the output, e.g. n_eff lub delta_n_eff
-        # plot_predicted_actual_single_array_values(y_predicted, y_test, ct, param_name, training_config["save_plots"])
+        elif param_name == "all":
+            separate_predicted_actual_values_from_one_array_and_plot(y_predicted, y_test, ct,
+                                                                     training_config["save_plots"], param_name)
+        else:
+            # when we have only one parameter as the output, e.g. n_eff lub delta_n_eff
+            plot_predicted_actual_single_array_values(y_predicted, y_test, ct, param_name,
+                                                      training_config["save_plots"])
 
         print("~ ~ Saving to files predictions and models ~ ~")
         save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, neural_network)
@@ -155,9 +172,9 @@ if __name__ == "__main__":
     # run_training_without_callbacks("coefficients", 2)
     # run_training_with_callbacks("coefficients", 2)
     # run_training_without_callbacks("coefficients", 2)
-    run_training_with_callbacks("coefficients", 1)
-    run_training_with_callbacks("coefficients", 2)
-    run_training_with_callbacks("coefficients", 3)
+    # run_training_with_callbacks("coefficients", 1)
+    # run_training_with_callbacks("coefficients", 2)
+    run_training_with_callbacks("coefficients", 4)
     # run_training_without_callbacks("coefficients", 1)
 
     # run_training_without_callbacks("n_eff", 1)

@@ -179,6 +179,12 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         with open(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}.json", "w") as outfile:
             json.dump(output_results, outfile, indent=4)
 
+        np.save(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}.py", np.array([
+            X_test.tolist(),
+            y_test.tolist(),
+            y_predicted.tolist()
+        ]))
+
         filename_model = f"{nn_trained.model_name}_trained_model_" + ct + ".keras"
         nn_trained.model.save(f"./trainings/{ct}/{filename_model}")
         print(f"All metrics, data and model saved successfully in {ct} folder and in {filename_model}!")

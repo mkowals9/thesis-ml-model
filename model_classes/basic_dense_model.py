@@ -1,8 +1,8 @@
 import keras
 from keras import Input
 from keras.models import Sequential
-from keras.src.layers import Reshape, Dropout, Flatten
-from keras.layers import Dense, LSTM, Bidirectional
+from keras.src.layers import Reshape, Flatten
+from keras.layers import Dense
 from tensorflow.keras import regularizers
 
 
