@@ -83,7 +83,7 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
 
         print("All metrics plots saved successfully!")
     except Exception as e:
-        print(f"An error has occurred during plots creation: {e}")
+        print(f"An error has occurred during metrics plots creation: {e}")
 
 
 # only one parameter on the output, the length = number of sections

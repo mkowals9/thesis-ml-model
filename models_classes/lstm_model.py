@@ -8,6 +8,8 @@ from keras.src.layers import Dropout, Reshape, Flatten
 class LstmModel:
 
     def create_standard_model(self):
+        l2_lambda = 0.001
+        l1_lambda = 0.001
 
         model = Sequential([
             Input(shape=self.input_shape),

@@ -8,6 +8,9 @@ from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense
 class CnnModel:
 
     def create_standard_model(self):
+        l2_lambda = 0.001
+        l1_lambda = 0.001
+
         model = Sequential([
             Input(shape=self.input_shape),
             Conv1D(filters=200, kernel_size=2, activation='relu'),  # 64
@@ -24,9 +27,9 @@ class CnnModel:
             MaxPooling1D(pool_size=2),
             # Dropout(0.1),
             Flatten(),
-            Dense(self.output_dim+10, activation='relu', kernel_regularizer=regularizers.l2(0.0001)),
-            Dense(self.output_dim, activation='relu'),
-            Dense(self.output_dim, activation='linear', kernel_regularizer=regularizers.l2(0.0001))
+            Dense(self.output_dim+10, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
+            Dense(self.output_dim, activation='relu', kernel_regularizer=regularizers.l1(l1_lambda)),
+            Dense(self.output_dim, activation='linear', kernel_regularizer=regularizers.l2(l2_lambda))
         ])
 
         mean_squared_error = keras.metrics.MeanSquaredError()

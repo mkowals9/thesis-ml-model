@@ -10,6 +10,7 @@ class BasicDenseModel:
 
     def create_standard_model(self):
         l2_lambda = 0.001
+        l1_lambda = 0.001
 
         model = Sequential([
             Input(shape=self.input_shape),
@@ -23,7 +24,7 @@ class BasicDenseModel:
             Dense(200, activation='softplus'),
             Dense(150, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
             # Dense(self.output_dim+100, activation='relu'),
-            Dense(100, activation='relu'),
+            Dense(100, activation='relu', kernel_regularizer=regularizers.l1(l1_lambda)),
             # Dense(25, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
             # Dense(60, activation='relu'),
             # Dense(15, activation='relu'),
