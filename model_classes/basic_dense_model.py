@@ -1,9 +1,10 @@
 import keras
 from keras import Input
 from keras.models import Sequential
-from keras.src.layers import Reshape, Flatten
+from keras.src.layers import Reshape, Flatten, Activation
 from keras.layers import Dense
 from tensorflow.keras import regularizers
+from keras import activations
 
 
 class BasicDenseModel:
@@ -14,27 +15,28 @@ class BasicDenseModel:
 
         model = Sequential([
             Input(shape=self.input_shape),
-            # Bidirectional(LSTM(300, activation='relu', return_sequences=True)),
-            # Dropout(rate=0.55),
-            # Bidirectional(LSTM(90, activation='relu', return_sequences=True)),
-            # Dropout(rate=0.55),
-            # Bidirectional(LSTM(200, activation='relu', return_sequences=False)),
-            Dense(300, activation='relu'),
+            Dense(300),
+            Activation(activations.relu),
             # Dense(250, activation='relu'),
-            Dense(200, activation='softplus'),
-            Dense(150, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
+            Dense(200),
+            Activation(activations.relu),
+            Dense(150, kernel_regularizer=regularizers.l2(l2_lambda)),
+            Activation(activations.relu),
             # Dense(self.output_dim+100, activation='relu'),
-            Dense(100, activation='relu', kernel_regularizer=regularizers.l1(l1_lambda)),
+            Dense(100, kernel_regularizer=regularizers.l1(l1_lambda)),
+            Activation(activations.relu),
             # Dense(25, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
             # Dense(60, activation='relu'),
             # Dense(15, activation='relu'),
             # if only one array on the output
             # Dense(15, activation='linear', kernel_regularizer=regularizers.l2(l2_lambda)),
-            Dense(self.output_dim, activation='relu'),
+            Dense(self.output_dim),
+            Activation(activations.relu),
             # Dense(self.output_dim, activation='linear'),
             Reshape((300, self.output_dim)),
             Flatten(),
-            Dense(self.output_dim, activation="relu"),
+            Dense(self.output_dim),
+            Activation(activations.relu),
             Dense(self.output_dim)
         ])
 

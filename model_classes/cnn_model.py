@@ -2,6 +2,8 @@ import keras
 from keras import Input, regularizers
 from keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense
+from keras.src.layers import Activation
+from keras import activations
 
 
 class CnnModel:
@@ -26,8 +28,10 @@ class CnnModel:
             MaxPooling1D(pool_size=2),
             # Dropout(0.1),
             Flatten(),
-            Dense(self.output_dim+10, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
-            Dense(self.output_dim, activation='relu', kernel_regularizer=regularizers.l1(l1_lambda)),
+            Dense(self.output_dim + 10, kernel_regularizer=regularizers.l2(l2_lambda)),
+            Activation(activations.relu),
+            Dense(self.output_dim, kernel_regularizer=regularizers.l1(l1_lambda)),
+            Activation(activations.relu),
             Dense(self.output_dim, activation='linear', kernel_regularizer=regularizers.l2(l2_lambda))
         ])
 

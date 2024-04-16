@@ -50,8 +50,12 @@ def coefficients_in_chunk_to_list(chunk_dict, folder_name):
 
 
 def load_chunked_data_npy(param_name: str):
-    folder_name = DATA_MODEL_COEFFICIENTS
 
+    # TODO !!!! REMEMBER TO CHANGE FOLDER NAME !!!!!
+    if param_name == "coefficients":
+        folder_name = DATA_MODEL_COEFFICIENTS
+    else:
+        folder_name = DATA_MODEL_POLYNOMIAL_MIXED_TOTAL_RANDOM
     # CODE IF WE WANT TO HAVE AS THE OUTPUT A, B, C, D
     filenames = os.listdir(folder_name)
     chunks = {}
@@ -64,10 +68,12 @@ def load_chunked_data_npy(param_name: str):
                 chunks[chunk_index] = {}
             chunks[chunk_index].setdefault(data_type, []).append(filename)
     chunks_list = list(chunks.values())
-    loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+    if param_name == "coefficients":
+        loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+    else:
+        loaded_chunk_data = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
 
     # folder_name = DATA_MODEL_PARABOLIC_SCALED
-
     # filenames = os.listdir(folder_name)
     # chunks = {}
     #
@@ -81,13 +87,14 @@ def load_chunked_data_npy(param_name: str):
     # chunks_list = list(chunks.values())
     # loaded_chunk_data = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
 
-    # ONLY 1/2 OF ALL DATA
-    # subarray_length = len(loaded_chunk_data_org) // 4
-    # start_index = len(loaded_chunk_data_org) // 2
+    # ONLY 1/4 OF ALL DATA
+    # w = 4
+    # subarray_length = len(loaded_chunk_data) // w
+    # start_index = len(loaded_chunk_data) // 2
     #
-    # loaded_chunk_data = loaded_chunk_data_org[start_index:start_index + subarray_length]
+    # loaded_chunk_data = loaded_chunk_data[start_index:start_index + subarray_length]
 
-    #tylko reflektancje w osi X
+    # tylko reflektancje w osi X
     X_data = np.array([sublist for object_data in loaded_chunk_data for sublist in object_data[0]])
 
     # (X,Y) w X_data
@@ -179,14 +186,15 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
         with open(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}.json", "w") as outfile:
             json.dump(output_results, outfile, indent=4)
 
-        np.save(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}.py", np.array([
-            X_test.tolist(),
-            y_test.tolist(),
-            y_predicted.tolist()
-        ]))
-
         filename_model = f"{nn_trained.model_name}_trained_model_" + ct + ".keras"
         nn_trained.model.save(f"./trainings/{ct}/{filename_model}")
+
+        np.save(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}_X_test.py",
+                np.array(X_test.tolist()))
+        np.save(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}_y_test.py",
+                np.array(y_test.tolist()))
+        np.save(f"./trainings/{ct}/model_output_{ct}_{nn_trained.model_name}_y_predicted.py",
+                np.array(y_predicted.tolist()))
         print(f"All metrics, data and model saved successfully in {ct} folder and in {filename_model}!")
     except Exception as e:
         print(f"Save files error: {e}")

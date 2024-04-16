@@ -2,7 +2,8 @@ import keras
 from keras import Input, regularizers
 from keras.models import Sequential
 from keras.layers import Dense, GRU
-from keras.src.layers import Dropout, Reshape, Flatten
+from keras.src.layers import Dropout, Reshape, Flatten, Activation
+from keras import activations
 
 
 class GruModel:
@@ -13,18 +14,26 @@ class GruModel:
 
         model = Sequential([
             Input(shape=self.input_shape),
-            GRU(50, activation='relu', return_sequences=True),
+            GRU(50, return_sequences=True),
+            Activation(activations.relu),
             Dropout(rate=0.25),
-            GRU(40, activation='relu', return_sequences=True),
+            GRU(40, return_sequences=True),
+            Activation(activations.relu),
             Dropout(rate=0.5),
-            Dense(40, activation='relu'),
-            Dense(self.output_dim+20, activation='relu', kernel_regularizer=regularizers.l1(l1_lambda)),
-            Dense(self.output_dim+20, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
+            Dense(40),
+            Activation(activations.relu),
+            Dense(self.output_dim + 20,
+                  kernel_regularizer=regularizers.l1(l1_lambda)),
+            Activation(activations.relu),
+            Dense(self.output_dim + 20,
+                  kernel_regularizer=regularizers.l2(l2_lambda)),
+            Activation(activations.relu),
             Reshape((-1, self.output_dim)),
             Flatten(),
-            Dense(self.output_dim, activation='linear'),
-            Dense(self.output_dim, activation='relu'),
-
+            Dense(self.output_dim),
+            Activation(activations.linear),
+            Dense(self.output_dim),
+            Activation(activations.relu),
         ])
 
         mean_squared_error = keras.metrics.MeanSquaredError()
@@ -43,7 +52,7 @@ class GruModel:
         # shape of initial is n,800,2 [[x1, y1], .. ]
         # self.input_shape = (1600, 1)
         self.input_shape = (300, 2)
-        self.output_dim = 16
+        self.output_dim = 15
         self.model = None
         self.create_standard_model()
         self.model_name = "gru_model"

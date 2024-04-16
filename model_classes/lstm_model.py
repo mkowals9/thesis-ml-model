@@ -2,7 +2,8 @@ import keras
 from keras import Input
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
-from keras.src.layers import Dropout, Reshape, Flatten
+from keras.src.layers import Dropout, Reshape, Flatten, Activation
+from keras import activations
 
 
 class LstmModel:
@@ -17,14 +18,18 @@ class LstmModel:
             Dropout(rate=0.25),
             LSTM(40, activation='relu', return_sequences=True),
             Dropout(rate=0.5),
-            Dense(40, activation='relu'),
-            Dense(self.output_dim+20, activation='relu'),
-            Dense(self.output_dim+20, activation='relu'),
+            Dense(40),
+            Activation(activations.relu),
+            Dense(self.output_dim+20),
+            Activation(activations.relu),
+            Dense(self.output_dim+20),
+            Activation(activations.relu),
             Reshape((-1, self.output_dim)),
             Flatten(),
-            Dense(self.output_dim, activation='linear'),
-            Dense(self.output_dim, activation='relu'),
-
+            Dense(self.output_dim),
+            Activation(activations.linear),
+            Dense(self.output_dim),
+            Activation(activations.relu),
         ])
 
         mean_squared_error = keras.metrics.MeanSquaredError()
