@@ -20,13 +20,11 @@ class GruModel:
             GRU(40, return_sequences=True),
             Activation(activations.relu),
             Dropout(rate=0.5),
-            Dense(40),
+            Dense(30),
             Activation(activations.relu),
-            Dense(self.output_dim + 20,
-                  kernel_regularizer=regularizers.l1(l1_lambda)),
+            Dense(self.output_dim + 10, kernel_regularizer=regularizers.l1(l1_lambda)),
             Activation(activations.relu),
-            Dense(self.output_dim + 20,
-                  kernel_regularizer=regularizers.l2(l2_lambda)),
+            Dense(self.output_dim, kernel_regularizer=regularizers.l2(l2_lambda)),
             Activation(activations.relu),
             Reshape((-1, self.output_dim)),
             Flatten(),
@@ -52,7 +50,7 @@ class GruModel:
         # shape of initial is n,800,2 [[x1, y1], .. ]
         # self.input_shape = (1600, 1)
         self.input_shape = (300, 2)
-        self.output_dim = 15
+        self.output_dim = 16
         self.model = None
         self.create_standard_model()
         self.model_name = "gru_model"

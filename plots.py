@@ -193,7 +193,7 @@ def generate_polynomial_y_from_coef_and_scale(coeffs, x_values, desired_min, des
 
 def plot_from_coefficients(y_predicted, y_test, ct, save_plots):
     try:
-        random_values = random.sample(range(0, len(y_predicted)), 10)
+        random_values = random.sample(range(0, len(y_predicted)-1), 10)
         sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
         L = 4e-3 * 1e3  # change if the L changes in data generation
         x_values = np.linspace(-L / 2, L / 2, 15)
@@ -216,7 +216,7 @@ def plot_from_coefficients(y_predicted, y_test, ct, save_plots):
                 elif i == 3:
                     pred_values = generate_polynomial_y_from_coef_and_scale(y_pred[12:16], x_values, 5.350, 5.400)
                     actual_values = generate_polynomial_y_from_coef_and_scale(y_actual[12:16], x_values, 5.350, 5.400)
-                    param_name = "periods"
+                    param_name = "period"
                 plt.plot(sections, pred_values, marker='o', drawstyle='steps-post', label='Predicted values')
                 plt.plot(sections, actual_values, marker='o', drawstyle='steps-post', label='Actual values')
                 plt.xlabel('Sections')
