@@ -1,6 +1,6 @@
 {
-  "batch_size": 30,
-  "epochs": 20,
-  "k_folds": 3,
+  "batch_size": 20,
+  "epochs": 200,
+  "k_folds": 5,
   "save_plots": true
 }

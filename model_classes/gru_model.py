@@ -17,9 +17,9 @@ class GruModel:
             GRU(50, return_sequences=True),
             Activation(activations.relu),
             Dropout(rate=0.25),
-            GRU(40, return_sequences=True),
-            Activation(activations.relu),
-            Dropout(rate=0.5),
+            # GRU(40, return_sequences=True),
+            # Activation(activations.relu),
+            # Dropout(rate=0.5),
             Dense(30),
             Activation(activations.relu),
             Dense(self.output_dim + 10, kernel_regularizer=regularizers.l1(l1_lambda)),
@@ -37,7 +37,7 @@ class GruModel:
         mean_squared_error = keras.metrics.MeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
         root_mean_squared_error = keras.metrics.RootMeanSquaredError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-6, epsilon=1e-7),
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-5, epsilon=1e-7),
                       metrics=[mean_squared_error, mean_absolute_error, root_mean_squared_error],
                       loss='mean_absolute_error')
         model.summary()
@@ -50,7 +50,7 @@ class GruModel:
         # shape of initial is n,800,2 [[x1, y1], .. ]
         # self.input_shape = (1600, 1)
         self.input_shape = (300, 2)
-        self.output_dim = 16
+        self.output_dim = 15
         self.model = None
         self.create_standard_model()
         self.model_name = "gru_model"

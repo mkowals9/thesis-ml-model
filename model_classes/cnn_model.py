@@ -14,15 +14,15 @@ class CnnModel:
 
         model = Sequential([
             Input(shape=self.input_shape),
-            Conv1D(filters=200, kernel_size=2, activation='relu'),  # 64
+            Conv1D(filters=170, kernel_size=2, activation='relu'),  # 64
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=150, kernel_size=2, activation='relu'),  # 40
+            Conv1D(filters=120, kernel_size=2, activation='relu'),  # 40
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=120, kernel_size=2, activation='relu'),  # 32
+            Conv1D(filters=110, kernel_size=2, activation='relu'),  # 32
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=100, kernel_size=2, activation='relu'),  # 20
+            Conv1D(filters=90, kernel_size=2, activation='relu'),  # 20
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=80, kernel_size=2, activation='relu'),  # 20
+            Conv1D(filters=70, kernel_size=2, activation='relu'),  # 20
             MaxPooling1D(pool_size=2),
             Conv1D(filters=16, kernel_size=2, activation='relu'),  # 20
             MaxPooling1D(pool_size=2),
@@ -39,7 +39,7 @@ class CnnModel:
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
         root_mean_squared_error = keras.metrics.RootMeanSquaredError()
         # mean_absolute_percentage_error = keras.metrics.MeanAbsolutePercentageError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.00001, epsilon=1e-7),
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-5, epsilon=1e-7),
                       metrics=[mean_squared_error, mean_absolute_error, root_mean_squared_error],
                       loss='mean_absolute_error')
         model.summary()
@@ -53,6 +53,6 @@ class CnnModel:
         # self.input_shape = (1600, 1)
         self.input_shape = (300, 2)
         self.model = None
-        self.output_dim = 16
+        self.output_dim = 15
         self.create_standard_model()
         self.model_name = "cnn_model"

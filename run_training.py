@@ -13,7 +13,7 @@ from save_read_files import load_training_config, save_all_to_files
 import numpy as np
 
 
-def run_training_with_callbacks_and_k_folds(param_name: str, model_index: int):
+def run_training_with_callbacks_and_with_k_folds(param_name: str, model_index: int):
     X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data(param_name)
 
     early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='auto')
@@ -66,7 +66,7 @@ def run_training_with_callbacks_and_k_folds(param_name: str, model_index: int):
                                    training_config, y_test, y_train, param_name, models[best_model_index])
 
 
-def run_training_without_callbacks_and_k_folds(param_name: str, model_index: int):
+def run_training_without_callbacks_and_with_k_folds(param_name: str, model_index: int):
     X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data(param_name)
 
     print("~ ~ Training start ~ ~")
@@ -125,8 +125,8 @@ def run_training_with_callbacks(param_name: str, model_index: int):
         neural_network = GruModel()
     X_test, X_test_reshaped, X_train_reshaped, training_config, y_test, y_train = prepare_data(param_name)
 
-    early_stopping_loss = EarlyStopping(monitor='loss', patience=5, verbose=1, mode='auto')
-    early_stopping_val_loss = EarlyStopping(monitor='val_loss', patience=5, verbose=1, mode='auto')
+    early_stopping_loss = EarlyStopping(monitor='loss', patience=15, verbose=1, mode='min')
+    early_stopping_val_loss = EarlyStopping(monitor='val_loss', patience=15, verbose=1, mode='min')
     callbacks = [early_stopping_loss, early_stopping_val_loss]
 
     print("~ ~ Training start ~ ~")
@@ -225,10 +225,11 @@ if __name__ == "__main__":
     # run_training_without_callbacks("coefficients", 2)
     # run_training_with_callbacks("coefficients", 1)
     # run_training_with_callbacks("coefficients", 2)
-    # run_training_with_callbacks("coefficients", 4)
-    # run_training_without_callbacks("coefficients", 1)
+    # run_training_without_callbacks("n_eff", 4)
+    run_training_with_callbacks_and_with_k_folds("n_eff", 2)
 
-    run_training_without_callbacks_and_k_folds("coefficients", 4)
+    # run_training_without_callbacks_and_with_k_folds("coefficients", 4)
+    # run_training_with_callbacks_and_k_folds("coefficients", 4)
     # run_training_with_callbacks_and_k_folds("n_eff", 4)
 
     # run_training_without_callbacks("n_eff", 1)
@@ -243,5 +244,5 @@ if __name__ == "__main__":
     # run_training_without_callbacks("period", 2)
 
     # run_training_with_callbacks("period", 2)
-    # run_training_with_callbacks("Xz", 2)
+    # run_training_with_callbacks("X_z", 2)
     # run_training_with_callbacks("n_eff", 2)

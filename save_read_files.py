@@ -50,7 +50,6 @@ def coefficients_in_chunk_to_list(chunk_dict, folder_name):
 
 
 def load_chunked_data_npy(param_name: str):
-
     # TODO !!!! REMEMBER TO CHANGE FOLDER NAME !!!!!
     if param_name == "coefficients":
         folder_name = DATA_MODEL_COEFFICIENTS
@@ -68,6 +67,7 @@ def load_chunked_data_npy(param_name: str):
                 chunks[chunk_index] = {}
             chunks[chunk_index].setdefault(data_type, []).append(filename)
     chunks_list = list(chunks.values())
+
     if param_name == "coefficients":
         loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
     else:
@@ -112,7 +112,7 @@ def load_chunked_data_npy(param_name: str):
     elif param_name == "period":
         periods = np.array([val for object_data in loaded_chunk_data for val in object_data[2]])
         y_data = periods
-    elif param_name == "Xz":
+    elif param_name == "X_z":
         Xzs = np.array([val for object_data in loaded_chunk_data for val in object_data[3]])
         y_data = Xzs
     elif param_name == "delta_n_eff":
@@ -164,14 +164,14 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "logcosh": model_metrics.logcosh,
             # "val_logcosh": model_metrics.val_logcosh,
 
-            #"mean_absolute_percentage_error": model_metrics.mean_absolute_percentage_error,
-            #"val_mean_absolute_percentage_error": model_metrics.val_mean_absolute_percentage_error,
+            # "mean_absolute_percentage_error": model_metrics.mean_absolute_percentage_error,
+            # "val_mean_absolute_percentage_error": model_metrics.val_mean_absolute_percentage_error,
 
             # "mean_squared_logarithmic_error": model_metrics.mean_squared_logarithmic_error,
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": f"{nn_trained.model_name} siec, przeskalowane, tylko coeff"
+            "note": f"{nn_trained.model_name} siec, przeskalowane, period, k-fold"
         }
 
         output_results = {

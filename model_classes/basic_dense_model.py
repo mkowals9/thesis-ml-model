@@ -18,12 +18,12 @@ class BasicDenseModel:
             Dense(300),
             Activation(activations.relu),
             # Dense(250, activation='relu'),
-            Dense(200),
+            Dense(150),
             Activation(activations.relu),
-            Dense(150, kernel_regularizer=regularizers.l2(l2_lambda)),
+            Dense(75, kernel_regularizer=regularizers.l2(l2_lambda)),
             Activation(activations.relu),
             # Dense(self.output_dim+100, activation='relu'),
-            Dense(100, kernel_regularizer=regularizers.l1(l1_lambda)),
+            Dense(40, kernel_regularizer=regularizers.l1(l1_lambda)),
             Activation(activations.relu),
             # Dense(25, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda)),
             # Dense(60, activation='relu'),
@@ -43,7 +43,7 @@ class BasicDenseModel:
         mean_squared_error = keras.metrics.MeanSquaredError()
         root_mean_squared_error = keras.metrics.RootMeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.00001, epsilon=1e-7),
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-5, epsilon=1e-7),
                       metrics=[mean_squared_error, mean_absolute_error, root_mean_squared_error],
                       loss='mean_absolute_error')
         model.summary()
@@ -57,7 +57,7 @@ class BasicDenseModel:
         # self.input_shape = (1600, 1)
         # self.input_shape = (1, 300) <- when we have only [[y1, y2] .. ]
         self.input_shape = (300, 2)
-        self.output_dim = 16
+        self.output_dim = 15
         self.model = None
         self.create_standard_model()
         self.model_name = "basic_dense_model"

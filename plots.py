@@ -89,7 +89,7 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
 # only one parameter on the output, the length = number of sections
 def plot_predicted_actual_single_array_values(y_predicted, y_actual, ct, param_name, save_plots=False):
     try:
-        random_values = random.sample(range(0, len(y_predicted)), 3)
+        random_values = random.sample(range(0, len(y_predicted)), 20)
         sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
         for example_index in random_values:
             plt.plot(sections, y_predicted[example_index], drawstyle='steps-post', label='Predicted values')
@@ -115,7 +115,7 @@ def separate_predicted_actual_values_from_one_array_and_plot(y_predicted, y_actu
     try:
         # y_pred_matched = np.squeeze(y_predicted, axis=1)
         # y_test_matched = np.squeeze(y_actual, axis=1)
-        random_values = random.sample(range(0, len(y_predicted)), 3)
+        random_values = random.sample(range(0, len(y_predicted)), 20)
         sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
         for example_index in random_values:
             # param_name = "n_eff"
@@ -193,7 +193,7 @@ def generate_polynomial_y_from_coef_and_scale(coeffs, x_values, desired_min, des
 
 def plot_from_coefficients(y_predicted, y_test, ct, save_plots):
     try:
-        random_values = random.sample(range(0, len(y_predicted)-1), 10)
+        random_values = random.sample(range(0, len(y_predicted)-1), 20)
         sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
         L = 4e-3 * 1e3  # change if the L changes in data generation
         x_values = np.linspace(-L / 2, L / 2, 15)
