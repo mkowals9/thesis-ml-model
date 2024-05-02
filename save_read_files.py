@@ -3,6 +3,9 @@ import re
 import os
 import numpy as np
 
+from plots import make_new_directory
+
+# NONUNIFORM
 DATA_MODEL_NON_UNIFORM_1_MLN = '/home/marcelina/Documents/misc/model_inputs/non_uniform/npys'
 DATA_MODEL_1ST_CHUNKED = '/home/marcelina/Documents/misc/model_inputs/pierwsze_chunked_data'
 DATA_MODEL_GAUSS = '/home/marcelina/Documents/misc/model_inputs/gauss'
@@ -13,6 +16,13 @@ DATA_MODEL_PARABOLIC_SCALED = '/home/marcelina/Documents/misc/model_inputs/parab
 DATA_MODEL_POLYNOMIAL_MIXED = '/home/marcelina/Documents/misc/model_inputs/polynomial_2_3_first_mixed'
 DATA_MODEL_COEFFICIENTS = '/home/marcelina/Documents/misc/model_inputs/new_coef'
 DATA_MODEL_POLYNOMIAL_MIXED_TOTAL_RANDOM = '/home/marcelina/Documents/misc/model_inputs/polynomial_2_3_all_random_coef'
+DATA_MODEL_NO_UNIQUE = '/home/marcelina/Documents/misc/model_inputs/2_3_degree_polynomial_without_unique'
+DATA_MODEL_SINUSOID = '/home/marcelina/Documents/misc/model_inputs/sinusoid_first'
+
+# UNIFORM
+DATA_MODEL_INPUT_JSON = '/home/marcelina/Documents/misc/model_inputs/data_model_input.json'
+DATA_MODEL_40_PARAM_INPUT_WITH_X_Z_ = '/home/marcelina/Documents/misc/model_inputs/data_model_40_param_input_with_X_z_'
+DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_ = '/home/marcelina/Documents/misc/model_inputs/data_model_25_param_input_with_X_z_'
 
 TRAINING_CONFIG_JSON = './training_config.json'
 
@@ -54,7 +64,7 @@ def load_chunked_data_npy(param_name: str):
     if param_name == "coefficients":
         folder_name = DATA_MODEL_COEFFICIENTS
     else:
-        folder_name = DATA_MODEL_POLYNOMIAL_MIXED_TOTAL_RANDOM
+        folder_name = DATA_MODEL_SINUSOID
     # CODE IF WE WANT TO HAVE AS THE OUTPUT A, B, C, D
     filenames = os.listdir(folder_name)
     chunks = {}
@@ -72,6 +82,26 @@ def load_chunked_data_npy(param_name: str):
         loaded_chunk_data = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
     else:
         loaded_chunk_data = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+
+    # folder_name = DATA_MODEL_POLYNOMIAL_MIXED
+    # filenames = os.listdir(folder_name)
+    # chunks = {}
+    #
+    # for filename in filenames:
+    #     chunk_index = extract_chunk_index(filename)
+    #     if chunk_index is not None:
+    #         data_type = re.search(r'model_input_(\w+)_chunk', filename).group(1)
+    #         if chunk_index not in chunks:
+    #             chunks[chunk_index] = {}
+    #         chunks[chunk_index].setdefault(data_type, []).append(filename)
+    # chunks_list = list(chunks.values())
+    #
+    # if param_name == "coefficients":
+    #     loaded_chunk_data_2 = [coefficients_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+    # else:
+    #     loaded_chunk_data_2 = [parameters_in_chunk_to_list(chunk_dict, folder_name) for chunk_dict in chunks_list]
+    #
+    # loaded_chunk_data.extend(loaded_chunk_data_2)
 
     # folder_name = DATA_MODEL_PARABOLIC_SCALED
     # filenames = os.listdir(folder_name)
@@ -171,7 +201,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": f"{nn_trained.model_name} siec, przeskalowane, period, k-fold"
+            "note": f"{nn_trained.model_name} siec, przeskalowane, n_eff, k-fold, no unique"
         }
 
         output_results = {
@@ -179,6 +209,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             "y_test": y_test.tolist(),
             "y_predicted": y_predicted.tolist()
         }
+        make_new_directory(ct)
 
         with open(f"./trainings/{ct}/model_training_output_{ct}_{nn_trained.model_name}.json", "w") as outfile:
             json.dump(output_training, outfile, indent=4)
@@ -208,6 +239,27 @@ def convert_json_to_npy():
             data = json.load(f)
         array_data = np.array(list(data.values()))
         np.save(DATA_MODEL_NON_UNIFORM_1_MLN + '/data_model_input_last.npy', array_data)
+
+
+def load_uniform_gratings_jsons():
+    data = []
+    try:
+        with open('%s0.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_1:
+            data.extend(json.load(json_file_1))
+        with open('%s1.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_2:
+            data.extend(json.load(json_file_2))
+        with open('%s2.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_3:
+            data.extend(json.load(json_file_3))
+        with open('%s3.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_4:
+            data.extend(json.load(json_file_4))
+        with open('%s4.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_5:
+            data.extend(json.load(json_file_5))
+        with open('%s5.json' % DATA_MODEL_25_PARAM_INPUT_WITH_X_Z_, 'r') as json_file_6:
+            data.extend(json.load(json_file_6))
+    except Exception as e:
+        print(f"Error while reading jsons with uniform gratings: {str(e)}")
+    return data
+
 
 # if __name__ == "__main__":
 #     convert_json_to_npy()

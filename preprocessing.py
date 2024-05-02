@@ -4,8 +4,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import os
 import scipy
+import random
 
-from save_read_files import load_chunked_data_npy
+from save_read_files import load_chunked_data_npy, load_uniform_gratings_jsons
 
 TRAINING_CONFIG_JSON = './training_config.json'
 
@@ -18,6 +19,13 @@ def env_setup():
     os.environ["XDG_SESSION_TYPE"] = "xcb"
 
     # tf.config.threading.set_inter_op_parallelism_threads(16)
+
+
+def generate_800_wavelenghts():
+    num_points = 800
+    start_value = 1.45e-6 * 1e6  # początkowy zakres fal
+    end_value = 1.6e-6 * 1e6  # końcowy zakres fal
+    return np.linspace(start_value, end_value, num_points)
 
 
 def convert_to_decibels(data):
@@ -40,6 +48,11 @@ def scaling_Xs_wavelength_reflectance(X_train, X_test):
     return X_train_scaled, X_test_scaled
 
 
+def scaling_Xs(X_train, X_test):
+    return (np.array([sc.fit_transform(X) for X in X_train]),
+            np.array([sc.fit_transform(X) for X in X_test]))
+
+
 def divide_input_data(data):
     try:
         X_train, X_test, y_train, y_test = train_test_split(data[0], data[1],
@@ -47,6 +60,41 @@ def divide_input_data(data):
         return X_train, X_test, y_train, y_test
     except Exception as e:
         print(f"Divide input data error: {e}")
+
+
+def divide_input_data_uniform_case(data):
+    try:
+        random.shuffle(data)
+        wavelengths = generate_800_wavelenghts()
+        max_wavelength = max(wavelengths)
+        X_data = []
+        for data_object in data:
+            X_temp = []
+            for index, ref in enumerate(data_object["reflectance"]):
+                X_temp.append([wavelengths[index] / max_wavelength, ref])
+            X_data.append(X_temp)
+        y_data = [[data_object["n_eff"], data_object["delta_n_eff"], data_object["period"], data_object["X_z"]]
+                  for data_object in data]
+
+        X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.1, random_state=4280)
+
+        y_train = [[round(sublist[0], 3), sublist[1] * 1e3,
+                    sublist[2] * 1e6, round(sublist[3], 2)] for sublist in y_train]
+        y_test = [[round(sublist[0], 3), sublist[1] * 1e3,
+                   sublist[2] * 1e6, round(sublist[3], 2)] for sublist in y_test]
+
+        y_train = [[sublist[0], round(sublist[1], 3),
+                    round(sublist[2], 3), sublist[3]] for sublist in y_train]
+        y_test = [[sublist[0], round(sublist[1], 3),
+                   round(sublist[2], 3), sublist[3]] for sublist in y_test]
+
+        X_train = np.array(X_train)
+        X_test = np.array(X_test)
+        y_train = np.array(y_train)
+        y_test = np.array(y_test)
+        return X_train, X_test, y_train, y_test
+    except Exception:
+        print("Divide input data error")
 
 
 def perform_find_peaks(X_array):
@@ -58,7 +106,7 @@ def perform_find_peaks(X_array):
     return [sublist1 + sublist2 for sublist1, sublist2 in zip(elements1, elements2)]
 
 
-def data_setup(param_name: str):
+def data_setup_nonuniform(param_name: str):
     try:
         data = load_chunked_data_npy(param_name)
         (X_train, X_test, y_train, y_test) = divide_input_data(data)
@@ -91,3 +139,18 @@ def data_setup(param_name: str):
         # return X_test, X_train_scaled, X_test_scaled, y_train, y_test
     except Exception as e:
         print(f"Data setup error : {e}")
+
+
+def data_setup_uniform():
+    # 800 elementów jako długości fal
+    try:
+        data = load_uniform_gratings_jsons()
+
+        (X_train, X_test, y_train, y_test) = divide_input_data_uniform_case(data)
+        (X_train_scaled, X_test_scaled) = scaling_Xs(X_train, X_test)
+
+        X_train_reshaped = X_train_scaled.reshape(len(X_train_scaled), -1)
+        X_test_reshaped = X_test_scaled.reshape(len(X_test_scaled), -1)
+        return X_test, X_train_reshaped, X_test_reshaped, y_train, y_test
+    except Exception as e:
+        print(f"Data setup error: {str(e)}")
