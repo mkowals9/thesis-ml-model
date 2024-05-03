@@ -224,7 +224,8 @@ if __name__ == "__main__":
     # run_training_without_callbacks("coefficients", 2)
     # run_training_with_callbacks("coefficients", 1)
     # run_training_with_callbacks("coefficients", 2)
-    run_training_without_callbacks("", 1, True)
+    # run_training_with_callbacks("n_eff", 4, False)
+    run_training_with_callbacks("", 2, True)
 
     # run_training_with_callbacks_and_with_k_folds("n_eff", 4, False)
     # run_training_without_callbacks_and_with_k_folds("delta_n_eff", 4, False)

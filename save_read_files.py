@@ -18,6 +18,8 @@ DATA_MODEL_COEFFICIENTS = '/home/marcelina/Documents/misc/model_inputs/new_coef'
 DATA_MODEL_POLYNOMIAL_MIXED_TOTAL_RANDOM = '/home/marcelina/Documents/misc/model_inputs/polynomial_2_3_all_random_coef'
 DATA_MODEL_NO_UNIQUE = '/home/marcelina/Documents/misc/model_inputs/2_3_degree_polynomial_without_unique'
 DATA_MODEL_SINUSOID = '/home/marcelina/Documents/misc/model_inputs/sinusoid_first'
+DATA_MODEL_SINUSOID_MORE = '/home/marcelina/Documents/misc/model_inputs/sinusoid_more_shifts'
+
 
 # UNIFORM
 DATA_MODEL_INPUT_JSON = '/home/marcelina/Documents/misc/model_inputs/data_model_input.json'
@@ -64,7 +66,7 @@ def load_chunked_data_npy(param_name: str):
     if param_name == "coefficients":
         folder_name = DATA_MODEL_COEFFICIENTS
     else:
-        folder_name = DATA_MODEL_SINUSOID
+        folder_name = DATA_MODEL_SINUSOID_MORE
     # CODE IF WE WANT TO HAVE AS THE OUTPUT A, B, C, D
     filenames = os.listdir(folder_name)
     chunks = {}
@@ -201,7 +203,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": f"{nn_trained.model_name} siec, przeskalowane, n_eff, k-fold, no unique"
+            "note": f"{nn_trained.model_name} siec, przeskalowane, n_eff, no k-fold, sinusoidy z y shift"
         }
 
         output_results = {

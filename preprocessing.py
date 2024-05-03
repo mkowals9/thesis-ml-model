@@ -56,7 +56,7 @@ def scaling_Xs(X_train, X_test):
 def divide_input_data(data):
     try:
         X_train, X_test, y_train, y_test = train_test_split(data[0], data[1],
-                                                            test_size=0.15, random_state=11235813)
+                                                            test_size=0.1, random_state=11235813)
         return X_train, X_test, y_train, y_test
     except Exception as e:
         print(f"Divide input data error: {e}")
@@ -149,8 +149,10 @@ def data_setup_uniform():
         (X_train, X_test, y_train, y_test) = divide_input_data_uniform_case(data)
         (X_train_scaled, X_test_scaled) = scaling_Xs(X_train, X_test)
 
-        X_train_reshaped = X_train_scaled.reshape(len(X_train_scaled), -1)
-        X_test_reshaped = X_test_scaled.reshape(len(X_test_scaled), -1)
+        # X_train_reshaped = X_train_scaled.reshape(len(X_train_scaled), -1)
+        # X_test_reshaped = X_test_scaled.reshape(len(X_test_scaled), -1)
+        X_train_reshaped = X_train_scaled
+        X_test_reshaped = X_test_scaled
         return X_test, X_train_reshaped, X_test_reshaped, y_train, y_test
     except Exception as e:
         print(f"Data setup error: {str(e)}")
