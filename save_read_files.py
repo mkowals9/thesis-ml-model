@@ -203,7 +203,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": f"{nn_trained.model_name} siec, przeskalowane, n_eff, no k-fold, sinusoidy z y shift"
+            "note": f"{nn_trained.model_name} siec, przeskalowane, jednorodne, k-fold"
         }
 
         output_results = {

@@ -18,12 +18,12 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
         make_new_directory(ct)
 
         # Plot training and validation loss
-        plt.plot(epochs_range, metrics.loss, label='Training Loss')
-        plt.plot(epochs_range, metrics.val_loss, label='Validation Loss')
+        plt.plot(epochs_range, metrics.loss, label='Loss - zbiór treningowy')
+        plt.plot(epochs_range, metrics.val_loss, label='Loss - zbiór walidacyjny')
         # plt.yscale('log')
-        plt.xlabel('Epochs')
+        plt.xlabel('Epoki')
         plt.ylabel('Loss')
-        plt.title('Training and Validation Loss')
+        plt.title('Loss - zbiór treningowy i walidacyjny')
         plt.legend()
         plt.grid(True)
         if save_plots:
@@ -34,12 +34,12 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
             plt.clf()
 
         # Plot training and validation mse
-        plt.plot(epochs_range, metrics.mean_squared_error, label='Training MSE')
-        plt.plot(epochs_range, metrics.val_mean_squared_error, label='Validation MSE')
-        plt.yscale('log')
-        plt.xlabel('Epochs')
+        plt.plot(epochs_range, metrics.mean_squared_error, label='MSE - zbiór treningowy')
+        plt.plot(epochs_range, metrics.val_mean_squared_error, label='MSE - zbiór walidacyjny')
+        # plt.yscale('log')
+        plt.xlabel('Epoki')
         plt.ylabel('MSE')
-        plt.title('Training and Validation MSE')
+        plt.title('MSE - zbiór treningowy i walidacyjny')
         plt.legend()
         plt.grid(True)
         if save_plots:
@@ -50,12 +50,12 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
             plt.clf()
 
         # Plot training and validation mae
-        plt.plot(epochs_range, metrics.mean_absolute_error, label='Training MAE')
-        plt.plot(epochs_range, metrics.val_mean_absolute_error, label='Validation MAE')
+        plt.plot(epochs_range, metrics.mean_absolute_error, label='MAE - zbiór treningowy')
+        plt.plot(epochs_range, metrics.val_mean_absolute_error, label='MAE - zbiór walidacyjny')
         # plt.yscale('log')
-        plt.xlabel('Epochs')
+        plt.xlabel('Epoki')
         plt.ylabel('MAE')
-        plt.title('Training and Validation MAE')
+        plt.title('MAE - zbiór treningowy i walidacyjny')
         plt.legend()
         plt.grid(True)
         if save_plots:
@@ -66,12 +66,12 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
             plt.clf()
 
         # Plot training and validation rmse
-        plt.plot(epochs_range, metrics.root_mean_squared_error, label='Training RMSE')
-        plt.plot(epochs_range, metrics.val_root_mean_squared_error, label='Validation RMSE')
+        plt.plot(epochs_range, metrics.root_mean_squared_error, label='RMSE - zbiór treningowy')
+        plt.plot(epochs_range, metrics.val_root_mean_squared_error, label='RMSE - zbiór walidacyjny')
         # plt.yscale('log')
-        plt.xlabel('Epochs')
+        plt.xlabel('Epoki')
         plt.ylabel('RMSE')
-        plt.title('Training and Validation RMSE')
+        plt.title('RMSE - zbiór treningowy i walidacyjny')
         plt.legend()
         plt.grid(True)
         if save_plots:
@@ -92,11 +92,11 @@ def plot_predicted_actual_single_array_values(y_predicted, y_actual, ct, param_n
         random_values = random.sample(range(0, len(y_predicted)), 20)
         sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
         for example_index in random_values:
-            plt.plot(sections, y_predicted[example_index], drawstyle='steps-post', label='Predicted values')
-            plt.plot(sections, y_actual[example_index], drawstyle='steps-post', label='Actual values')
-            plt.xlabel('Section')
+            plt.plot(sections, y_predicted[example_index], drawstyle='steps-post', label='Przewidziane wartości')
+            plt.plot(sections, y_actual[example_index], drawstyle='steps-post', label='Rzeczywiste wartości')
+            plt.xlabel('Indeksy sekcji')
             plt.ylabel(f'{param_name}')
-            plt.title(f'Predicted and actual values - parameter {param_name}')
+            plt.title(f'Przewidziane i rzeczywiste wartości - parameter {param_name}')
             plt.legend()
             plt.grid(True)
             if save_plots:
@@ -217,12 +217,12 @@ def plot_from_coefficients(y_predicted, y_test, ct, save_plots):
                     pred_values = generate_polynomial_y_from_coef_and_scale(y_pred[12:16], x_values, 5.350, 5.400)
                     actual_values = generate_polynomial_y_from_coef_and_scale(y_actual[12:16], x_values, 5.350, 5.400)
                     param_name = "period"
-                plt.plot(sections, pred_values, marker='o', drawstyle='steps-post', label='Predicted values')
-                plt.plot(sections, actual_values, marker='o', drawstyle='steps-post', label='Actual values')
-                plt.xlabel('Sections')
-                plt.ylabel('Values')
+                plt.plot(sections, pred_values, marker='o', drawstyle='steps-post', label='Przewidziane wartości')
+                plt.plot(sections, actual_values, marker='o', drawstyle='steps-post', label='Rzeczywiste wartości')
+                plt.xlabel('Indeksy sekcji')
+                plt.ylabel('Wartości')
                 plt.legend()
-                plt.title(f'Predicted vs Actual for parameter {param_name}')
+                plt.title(f'Przewidziane i rzeczywiste wartości parameteru {param_name}')
                 plt.grid(True)
                 if save_plots:
                     plt.savefig(

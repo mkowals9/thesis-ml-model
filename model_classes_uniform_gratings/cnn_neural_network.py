@@ -12,13 +12,13 @@ class CnnNeuralNetwork:
     def create_standard_model(self):
         model = Sequential([
             Input(shape=self.input_shape),
-            Conv1D(filters=40, kernel_size=2, activation='relu'),  #64
+            Conv1D(filters=40, kernel_size=2, activation='relu'),
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=32, kernel_size=2, activation='relu'),  #40
+            Conv1D(filters=32, kernel_size=2, activation='relu'),
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=25, kernel_size=2, activation='relu'),  #32
+            Conv1D(filters=25, kernel_size=2, activation='relu'),
             MaxPooling1D(pool_size=2),
-            Conv1D(filters=20, kernel_size=2, activation='relu'),  #20
+            Conv1D(filters=20, kernel_size=2, activation='relu'),
             MaxPooling1D(pool_size=2),
             Conv1D(filters=16, kernel_size=2, activation='relu'),
             MaxPooling1D(pool_size=2),
