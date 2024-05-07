@@ -8,7 +8,7 @@ import numpy as np
 
 FILE_KERAS_MODEL_PATH = "/home/marcelina/Desktop/uniform_cnn_1714761378_93348/cnn_nn_model_trained_model_1714761378_93348.keras"
 
-FILE_TRAINING_PATH = '/home/marcelina/Desktop/uniform_cnn_1714761378_93348/model_training_output_1714761378_93348_cnn_nn_model.json'
+FILE_TRAINING_PATH = '/home/marcelina/Documents/misc/thesis-ml-model/trainings/1714091053_624002/model_training_output_1714091053_624002_basic_dense_model.json'
 
 FILE_DATA_JSON_PATH = ('/home/marcelina/Documents/misc/master-thesis/new_code/stats/1708903520_261761'
                   '/model_output_1708903520_261761_base_neural_network_4_outputs.json')
@@ -23,7 +23,7 @@ def display_plot():
 
     epochs_range = range(1, training_data["epochs"] + 1)
 
-    metric_name = "mae"
+    metric_name = "mse"
     val_metric_name = "val_" + metric_name
     metric_name_formatted = metric_name.capitalize() if metric_name == "loss" else metric_name.upper()
     save_plots = False
@@ -89,4 +89,4 @@ def display_predictions():
 
 if __name__ == "__main__":
     display_plot()
-    display_predictions()
+    # display_predictions()

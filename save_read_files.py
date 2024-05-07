@@ -66,7 +66,7 @@ def load_chunked_data_npy(param_name: str):
     if param_name == "coefficients":
         folder_name = DATA_MODEL_COEFFICIENTS
     else:
-        folder_name = DATA_MODEL_SINUSOID_MORE
+        folder_name = DATA_MODEL_NO_UNIQUE
     # CODE IF WE WANT TO HAVE AS THE OUTPUT A, B, C, D
     filenames = os.listdir(folder_name)
     chunks = {}
@@ -203,7 +203,7 @@ def save_all_to_files(model_metrics, X_test, y_test, y_predicted, ct, nn_trained
             # "val_mean_squared_logarithmic_error": model_metrics.val_mean_squared_logarithmic_error,
 
             "config": model_metrics.training_config,
-            "note": f"{nn_trained.model_name} siec, przeskalowane, jednorodne, k-fold"
+            "note": f"{nn_trained.model_name} siec, n_eff, przeskalowane, niejednorodne, bez k-fold"
         }
 
         output_results = {
