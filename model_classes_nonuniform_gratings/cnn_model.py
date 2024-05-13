@@ -53,6 +53,6 @@ class CnnModel:
         # self.input_shape = (1600, 1)
         self.input_shape = (300, 2)
         self.model = None
-        self.output_dim = 15
+        self.output_dim = 16
         self.create_standard_model()
         self.model_name = "cnn_model"

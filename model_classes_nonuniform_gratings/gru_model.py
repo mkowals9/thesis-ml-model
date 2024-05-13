@@ -36,30 +36,30 @@ class GruModel:
 
         model = Sequential([
                 Input(shape=self.input_shape),
-                GRU(50, return_sequences=True),
+                GRU(125, return_sequences=True),
                 Activation(activations.relu),
                 Dropout(rate=0.5),
-                GRU(40, return_sequences=True),
+                GRU(60, return_sequences=True),
                 Activation(activations.relu),
                 Dropout(rate=0.5),
                 Dense(30),
                 Activation(activations.relu),
                 Dense(self.output_dim + 10, kernel_regularizer=regularizers.l1(l1_lambda)),
                 Activation(activations.relu),
-                Dense(self.output_dim, kernel_regularizer=regularizers.l2(l2_lambda)),
+                Dense(self.output_dim),
                 Activation(activations.relu),
                 Reshape((-1, self.output_dim)),
                 Flatten(),
                 Dense(self.output_dim),
-                Activation(activations.linear),
-                Dense(self.output_dim),
                 Activation(activations.relu),
+                Dense(self.output_dim),
+                Activation(activations.linear),
             ])
 
         mean_squared_error = keras.metrics.MeanSquaredError()
         mean_absolute_error = keras.metrics.MeanAbsoluteError()
         root_mean_squared_error = keras.metrics.RootMeanSquaredError()
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=5e-5, epsilon=1e-7),
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-6, epsilon=1e-7),
                       metrics=[mean_squared_error, mean_absolute_error, root_mean_squared_error],
                       loss='mean_absolute_error')
         model.summary()

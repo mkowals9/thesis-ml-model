@@ -215,41 +215,27 @@ def prepare_data(param_name: str, is_uniform: bool):
 
 if __name__ == "__main__":
     env_setup()
+    # run_training_without_callbacks("n_eff", 4, False)
+    # run_training_without_callbacks_and_with_k_folds("n_eff", 2, False)
 
     # TODO !!!! REMEMBER TO CHANGE FOLDER NAME IF YOU CHANGE PARAM_NAME (FILE SAVE_READ_FILES) !!!!
     # TODO !!!! AND OUTPUT DIMENSIONS OF MODELS !!!!
 
-    # run_training_without_callbacks("coefficients", 2)
+    # run_training_without_callbacks("coefficients", 1, False)
     # run_training_with_callbacks("coefficients", 2)
     # run_training_without_callbacks("coefficients", 2)
     # run_training_with_callbacks("coefficients", 1)
     # run_training_with_callbacks("coefficients", 2)
     # run_training_with_callbacks("n_eff", 4, False)
     # run_training_without_callbacks("period", 1, False)
-    run_training_without_callbacks("n_eff", 2, False)
+
+    # TODO do pracki
+    run_training_without_callbacks("n_eff", 4, False)
+    # run_training_without_callbacks("delta_n_eff", 2, False)
+    # run_training_without_callbacks("period", 2, False)
+    # run_training_without_callbacks("X_z", 2, False)
+    # run_training_without_callbacks("coefficients", 2, False)
 
 
-    # run_training_with_callbacks_and_with_k_folds("n_eff", 4, False)
-    # run_training_without_callbacks_and_with_k_folds("delta_n_eff", 4, False)
-    # # run_training_with_callbacks_and_with_k_folds("n_eff", 4)
-    # # run_training_with_callbacks_and_with_k_folds("delta_n_eff", 4)
-    # # run_training_with_callbacks_and_with_k_folds("period", 4)
 
-    # run_training_without_callbacks_and_with_k_folds("coefficients", 4)
-    # run_training_with_callbacks_and_k_folds("coefficients", 4)
-    # run_training_with_callbacks_and_k_folds("n_eff", 4)
 
-    # run_training_without_callbacks("n_eff", 1)
-    # run_training_without_callbacks("n_eff", 2)
-    # run_training_without_callbacks("X_z", 1)
-    # run_training_without_callbacks("X_z", 2)
-
-    # run_training_without_callbacks("delta_n_eff", 1)
-    # run_training_without_callbacks("delta_n_eff", 2)
-
-    # run_training_without_callbacks("period", 1)
-    # run_training_without_callbacks("period", 2)
-
-    # run_training_with_callbacks("period", 2)
-    # run_training_with_callbacks("X_z", 2)
-    # run_training_with_callbacks("n_eff", 2)
