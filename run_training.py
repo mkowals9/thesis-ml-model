@@ -229,7 +229,7 @@ if __name__ == "__main__":
     # run_training_with_callbacks("n_eff", 4, False)
     # run_training_without_callbacks("period", 1, False)
 
-    # TODO do pracki
+    # TODO
     run_training_without_callbacks("n_eff", 4, False)
     # run_training_without_callbacks("delta_n_eff", 2, False)
     # run_training_without_callbacks("period", 2, False)

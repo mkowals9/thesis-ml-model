@@ -126,7 +126,7 @@ def load_chunked_data_npy(param_name: str):
     #
     # loaded_chunk_data = loaded_chunk_data[start_index:start_index + subarray_length]
 
-    # tylko reflektancje w osi X
+    # only reflectance in Xs
     X_data = np.array([sublist for object_data in loaded_chunk_data for sublist in object_data[0]])
 
     # (X,Y) w X_data

@@ -3,6 +3,7 @@ import os
 import random
 import numpy as np
 
+M = 15
 
 def make_new_directory(ct):
     try:
@@ -90,7 +91,7 @@ def save_training_stats_as_plots_in_files(epochs_range, metrics, ct, save_plots=
 def plot_predicted_actual_single_array_values(y_predicted, y_actual, ct, param_name, save_plots=False):
     try:
         random_values = random.sample(range(0, len(y_predicted)), 20)
-        sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
+        sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == M else np.arange(1, M+1)
         for example_index in random_values:
             plt.plot(sections, y_predicted[example_index], drawstyle='steps-post', label='Przewidziane wartości')
             plt.plot(sections, y_actual[example_index], drawstyle='steps-post', label='Rzeczywiste wartości')
@@ -109,14 +110,14 @@ def plot_predicted_actual_single_array_values(y_predicted, y_actual, ct, param_n
         print(f"Param plots {param_name} from single array error: {e}")
 
 
-# output array has length 60, so 4 parameters with 15 values
+# output array has length 60, so 4 parameters with M values
 def separate_predicted_actual_values_from_one_array_and_plot(y_predicted, y_actual, ct, save_plots=False,
                                                              param_name="n_eff"):
     try:
         # y_pred_matched = np.squeeze(y_predicted, axis=1)
         # y_test_matched = np.squeeze(y_actual, axis=1)
         random_values = random.sample(range(0, len(y_predicted)), 20)
-        sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
+        sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == M else np.arange(1, M+1)
         for example_index in random_values:
             # param_name = "n_eff"
             param_index = 0
@@ -141,22 +142,22 @@ def separate_predicted_actual_values_from_one_array_and_plot(y_predicted, y_actu
         print(f"Param plots from one big array error: {e}")
 
 
-# output array of length 60, so 4 parameters with 15 values
+# output array of length 60, so 4 parameters with M values
 def plot_actual_predicted_for_param_from_one_big_param_array(ct, example_index, save_plots, sections, y_actual,
                                                              y_pred_matched, param_index, param_name):
     try:
         if param_index == 0 and param_name == "n_eff":
-            temp_y_pred = y_pred_matched[example_index][0:15]
-            temp_y_actual = y_actual[example_index][0:15]
+            temp_y_pred = y_pred_matched[example_index][0:M]
+            temp_y_actual = y_actual[example_index][0:M]
         elif param_index == 1 and param_name == "period":
-            temp_y_pred = y_pred_matched[example_index][15:30]
-            temp_y_actual = y_actual[example_index][15:30]
+            temp_y_pred = y_pred_matched[example_index][M:2*M]
+            temp_y_actual = y_actual[example_index][M:2*M]
         elif param_index == 2 and param_name == "X_z":
-            temp_y_pred = y_pred_matched[example_index][30:45]
-            temp_y_actual = y_actual[example_index][30:45]
+            temp_y_pred = y_pred_matched[example_index][2*M:3*M]
+            temp_y_actual = y_actual[example_index][2*M:3*M]
         elif param_index == 3 and param_name == "delta_n_eff":
-            temp_y_pred = y_pred_matched[example_index][45:60]
-            temp_y_actual = y_actual[example_index][45:60]
+            temp_y_pred = y_pred_matched[example_index][3*M:4*M]
+            temp_y_actual = y_actual[example_index][3*M:4*M]
         else:
             temp_y_pred = y_pred_matched
             temp_y_actual = y_actual
@@ -194,9 +195,9 @@ def generate_polynomial_y_from_coef_and_scale(coeffs, x_values, desired_min, des
 def plot_from_coefficients(y_predicted, y_test, ct, save_plots):
     try:
         random_values = random.sample(range(0, len(y_predicted)-1), 20)
-        sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == 15 else np.arange(1, 16)
+        sections = np.arange(1, len(y_predicted[0]) + 1) if y_predicted.shape[1] == M else np.arange(1, M+1)
         L = 4e-3 * 1e3  # change if the L changes in data generation
-        x_values = np.linspace(-L / 2, L / 2, 15)
+        x_values = np.linspace(-L / 2, L / 2, M)
         for example_index in random_values:
             y_pred = y_predicted[example_index]
             y_actual = y_test[example_index]

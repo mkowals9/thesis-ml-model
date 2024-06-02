@@ -11,7 +11,7 @@ FILE_KERAS_MODEL_PATH = "/home/marcelina/Desktop/uniform_cnn_1714761378_93348/cn
 FILE_TRAINING_PATH = '/home/marcelina/Documents/misc/thesis-ml-model/trainings/1714091053_624002/model_training_output_1714091053_624002_basic_dense_model.json'
 
 FILE_DATA_JSON_PATH = ('/home/marcelina/Documents/misc/master-thesis/new_code/stats/1708903520_261761'
-                  '/model_output_1708903520_261761_base_neural_network_4_outputs.json')
+                       '/model_output_1708903520_261761_base_neural_network_4_outputs.json')
 
 FILE_DATA_Y_TEST_PATH = '/home/marcelina/Desktop/uniform_cnn_1714761378_93348/model_output_1714761378_93348_cnn_nn_model_y_test.py.npy'
 FILE_DATA_Y_PRED_PATH = '/home/marcelina/Desktop/uniform_cnn_1714761378_93348/model_output_1714761378_93348_cnn_nn_model_y_predicted.py.npy'
@@ -29,7 +29,6 @@ def display_plot():
     save_plots = False
     ct = datetime.datetime.now().timestamp()
     ct = str(ct).replace(".", "_")
-
     plt.plot(epochs_range, training_data[metric_name], label=f'{metric_name_formatted} - zbiór treningowy')
     plt.plot(epochs_range, training_data[val_metric_name], label=f'{metric_name_formatted} - zbiór walidacyjny')
     # plt.yscale('log')
@@ -79,14 +78,18 @@ def display_predictions():
         msee = mean_squared_error(y_test_random[indd], y_pred_random[indd])
         mse.append(msee)
         rmse.append(np.sqrt(msee))
-    loaded_model = keras.saving.load_model(FILE_KERAS_MODEL_PATH)
-    print(" - - - Keras model - - - ")
-    loaded_model.summary()
     to_save = {"y_test": y_test_random, "y_pred": y_pred_random, "mae": mae, "mse": mse, "rmse": rmse}
     with open("./outputs.json", "w") as outfile:
         json.dump(to_save, outfile, indent=4)
 
 
+def display_model():
+    loaded_model = keras.saving.load_model(FILE_KERAS_MODEL_PATH)
+    print(" - - - Keras model - - - ")
+    loaded_model.summary()
+
+
 if __name__ == "__main__":
     display_plot()
+    # display_model()
     # display_predictions()

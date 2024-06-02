@@ -142,7 +142,7 @@ def data_setup_nonuniform(param_name: str):
 
 
 def data_setup_uniform():
-    # 800 elementów jako długości fal
+    # 800 elements as wavelengths
     try:
         data = load_uniform_gratings_jsons()
 
